@@ -21,7 +21,7 @@ class BaseResNetRunner(BaseRunner):
 
     def train_batch_and_get_metrics(self, batch):
         #forward pass
-        pred = self.nets[0](batch[self.input_idx]).squeeze()
+        pred = self.nets[0](batch[self.input_idx]).squeeze(dim=1)
         loss = self.loss_fn(pred, batch[2].float())
         acc = self.get_accuracy(pred, batch[2])
 

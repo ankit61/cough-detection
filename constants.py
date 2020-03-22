@@ -10,7 +10,7 @@ PRINT_FREQ                  = 20
 INTERMITTENT_OUTPUT_FREQ    = 5 # Num batches between outputs
 
 #HYPERPARAMETERS
-BATCH_SIZE                  = 32
+BATCH_SIZE                  = 1
 EPOCHS                      = 300
 LR                          = 0.05
 WEIGHT_DECAY                = 0
