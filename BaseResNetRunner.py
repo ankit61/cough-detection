@@ -4,7 +4,7 @@ import torch
 import constants
 
 class BaseResNetRunner(BaseRunner):
-    def __init__(self, net, input_index=None):
+    def __init__(self, net, input_index=None, load_paths=None):
         self.input_idx = input_index
         loss_fn = nn.BCEWithLogitsLoss()
         if torch.cuda.is_available():
@@ -16,7 +16,8 @@ class BaseResNetRunner(BaseRunner):
             loss_fn, 
             optimizers, 
             best_metric_name='loss', 
-            should_minimize_best_metric=True
+            should_minimize_best_metric=True,
+            load_paths=load_paths
         )
 
     def do_forward_pass(self, batch):
