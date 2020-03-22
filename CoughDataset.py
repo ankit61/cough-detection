@@ -51,16 +51,16 @@ class CoughDataset(Dataset):
 
         self.video_transforms = IT.Compose([
             VideoTransform(IT.ToPILImage()),
-            VideoTransform(IT.Resize(constants.INPUT_FRAME_WIDTH)),
-            #add horizontal flipping if needed
-            VideoTransform(IT.ToTensor())
+            VideoTransform(IT.Resize((constants.INPUT_FRAME_WIDTH, constants.INPUT_FRAME_WIDTH))),
+            VideoTransform(IT.ToTensor())#,
+            #VideoTransform(IT.Normalize(mean=constants.MEAN, std=constants.STD)),
         ])
 
         for f in fs:
             #break in 1 sec chunks and add label
             chunks = self.break_in_chunks(os.path.join(root_dir, f), labels[f], chunk_size)
             self.data += chunks
-
+        
     def __len__(self):
         return len(self.data)
 
@@ -71,9 +71,8 @@ class CoughDataset(Dataset):
         return self.data[idx]
 
     def break_in_chunks(self, f, cough_times, chunk_size):
-        v, a, meta = io.read_video(f, pts_unit='sec')
+        v, a, _ = io.read_video(f, pts_unit='sec')
         v = v.permute([0, 3, 1, 2])
-        print(v.shape)
 
         ans = []
         #break into chunks
@@ -84,12 +83,12 @@ class CoughDataset(Dataset):
         audio_range = range(0, end_audio_frame, constants.AUDIO_SAMPLE_RATE)
 
         for i, (v_frame, a_frame) in enumerate(zip(vid_range, audio_range)): 
-            v_chunk = v[v_frame:v_frame + constants.VIDEO_FPS]
-            a_chunk = a[:, a_frame:a_frame + constants.AUDIO_SAMPLE_RATE]
-            
             #apply transforms
+            v_chunk = self.video_transforms(v[v_frame:v_frame + constants.VIDEO_FPS])
+            a_chunk = self.audio_transforms(a[:, a_frame:a_frame + constants.AUDIO_SAMPLE_RATE])
+            
             ans.append(
-                (self.video_transforms(v_chunk), self.audio_transforms(a_chunk).squeeze(), 1 if i in cough_times else 0)
+                (v_chunk.permute([1, 0, 2, 3]), a_chunk, 1 if i in cough_times else 0)
             )
 
         return ans
