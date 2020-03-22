@@ -44,6 +44,8 @@ class BaseResNetRunner(BaseRunner):
         #backward pass
         self.optimizers[0].zero_grad()
         loss.backward()
+        self.output_gradient_norms(self.global_step)
+        self.output_weight_norms(self.global_step)
 
         #step
         self.optimizers[0].step()
@@ -52,7 +54,6 @@ class BaseResNetRunner(BaseRunner):
 
     def test_batch_and_get_metrics(self, batch):
         return self.get_metrics(batch)[1]
-        
 
     def get_accuracy(self, pred, gt):
         return ((pred > 0) == gt).sum().item() / gt.shape[0]

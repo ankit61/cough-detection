@@ -138,7 +138,6 @@ class BaseRunner(metaclass=ABCMeta):
                 for j, (metric_name, metric_val) in enumerate(metrics):
                     self.writer.add_scalar(os.path.join(self.name, prefix + '_' + 
                         metric_name), metric_val, self.global_step)
-                    self.global_step += 1
 
                     if not progress_display_made:
                         other_meters.append(utils.AverageMeter(metric_name))
@@ -146,6 +145,8 @@ class BaseRunner(metaclass=ABCMeta):
                     else:
                         other_meters[j].update(metric_val)
 
+                self.global_step += 1
+                
                 if not progress_display_made:
                     progress = utils.ProgressMeter(len(data_loader), other_meters + \
                         [batch_time_meter, data_time_meter], prefix=prefix)
