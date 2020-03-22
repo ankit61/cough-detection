@@ -6,12 +6,12 @@ import multiprocessing
 
 NUM_CLASSES                 = 1
 
-PRINT_FREQ                  = 20
+PRINT_FREQ                  = 3
 INTERMITTENT_OUTPUT_FREQ    = 5 # Num batches between outputs
 SAVE_FREQ                   = 5
 
 #HYPERPARAMETERS
-BATCH_SIZE                  = 16
+BATCH_SIZE                  = 32
 EPOCHS                      = 300
 LR                          = 0.05
 WEIGHT_DECAY                = 0
