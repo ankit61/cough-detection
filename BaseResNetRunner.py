@@ -31,7 +31,7 @@ class BaseResNetRunner(BaseRunner):
         print((pred > 0).tolist())
         print('<---------->')
         pred_01_rate = (pred < 0).sum() / pred.numel()
-        gt_01_rate  = (batch[2] < 1).sum() / batch[2].numel()
+        gt_01_rate  = (batch[2] < 1).float().sum() / batch[2].numel()
         print(batch[2].tolist())
 
         return loss, [('loss', loss.mean().item()), ('acc', acc), 
