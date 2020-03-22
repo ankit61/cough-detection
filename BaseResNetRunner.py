@@ -27,8 +27,11 @@ class BaseResNetRunner(BaseRunner):
         pred = self.do_forward_pass(batch)
         loss = self.loss_fn(pred, batch[2].float())
         acc  = self.get_accuracy(pred, batch[2])
+        print(pred.tolist())
+        print('<---------->')
         pred_01_rate = (pred < 0).sum() / pred.numel()
         gt_01_rate  = (batch[2] < 1).sum() / batch[2].numel()
+        print(batch[2].tolist())
 
         return loss, [('loss', loss.mean().item()), ('acc', acc), 
                 ('pred_01_rate', pred_01_rate), ('gt_01_rate', gt_01_rate)]
