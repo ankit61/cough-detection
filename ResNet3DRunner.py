@@ -10,7 +10,7 @@ def get_visual_model():
         )
 
 class ResNet3DRunner(BaseResNetRunner):
-    def __init__(self):
+    def __init__(self, load_paths=None):
         net = get_visual_model()
         input_idx = 0
-        super(ResNet3DRunner, self).__init__(net=net, input_index=input_idx)
+        super(ResNet3DRunner, self).__init__(net=net, input_index=input_idx, load_paths=load_paths)

@@ -17,14 +17,16 @@ args =  parser.parse_args()
 dataset = CoughDataset(root_dir=args.data_dir)
 
 if not args.load_path:
-    args.load_path = None
+    load_paths = None
+else:
+    load_paths = [args.load_path]
 
 if args.runner == 'multistream':
-    runner = MultiStreamDNNRunner(load_paths=[args.load_path])
+    runner = MultiStreamDNNRunner(load_paths=load_paths)
 elif args.runner == 'resnet':
-    runner = ResNetRunner(load_paths=[args.load_path])
+    runner = ResNetRunner(load_paths=load_paths)
 else:
-    runner = ResNet3DRunner(load_paths=[args.load_path])
+    runner = ResNet3DRunner(load_paths=load_paths)
 
 data_loader = DataLoader(
     dataset, 
