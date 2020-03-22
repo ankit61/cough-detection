@@ -38,7 +38,7 @@ class NormalizeAudio:
 
 class CoughDataset(Dataset):
     def __init__(self, root_dir = constants.DATA_BASE_DIR, chunk_size = constants.CHUNK_SIZE):
-        fs = [f for f in os.listdir(root_dir) if f.endswith('_rs.mp4')]
+        fs = [f for f in os.listdir(root_dir) if f.endswith('op_rs.mp4')]
         self.data = []
         labels = json.loads(open(os.path.join(root_dir, 'labels.json'), 'r').read())
 
@@ -52,15 +52,15 @@ class CoughDataset(Dataset):
         self.video_transforms = IT.Compose([
             VideoTransform(IT.ToPILImage()),
             VideoTransform(IT.Resize((constants.INPUT_FRAME_WIDTH, constants.INPUT_FRAME_WIDTH))),
-            VideoTransform(IT.ToTensor())#,
-            #VideoTransform(IT.Normalize(mean=constants.MEAN, std=constants.STD)),
+            VideoTransform(IT.ToTensor()),
+            VideoTransform(IT.Normalize(mean=constants.MEAN, std=constants.STD)),
         ])
 
         for f in fs:
             #break in 1 sec chunks and add label
-            chunks = self.break_in_chunks(os.path.join(root_dir, f), labels[f], chunk_size)
+            chunks = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, f[:-10] + '_rs.mp4'),  labels[f], chunk_size)
             self.data += chunks
-        
+
     def __len__(self):
         return len(self.data)
 
@@ -70,8 +70,10 @@ class CoughDataset(Dataset):
 
         return self.data[idx]
 
-    def break_in_chunks(self, f, cough_times, chunk_size):
-        v, a, _ = io.read_video(f, pts_unit='sec')
+    def break_in_chunks(self, video_file, audio_file, cough_times, chunk_size):
+        v = io.read_video(video_file, pts_unit='sec')[0]
+        a = io.read_video(audio_file, pts_unit='sec')[1]
+
         v = v.permute([0, 3, 1, 2])
 
         ans = []

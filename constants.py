@@ -30,4 +30,5 @@ TENSORBOARDX_BASE_DIR = os.path.join(
     Path(os.path.dirname(os.path.abspath(__file__))), os.path.join('runs', datetime.now().strftime('%b%d_%H-%M-%S') + '_' + getpass.getuser()))
 MODELS_BASE_DIR = os.path.join(
     Path(os.path.dirname(os.path.abspath(__file__))), 'models')
-DATA_BASE_DIR = '/media/sf_data'
+DATA_BASE_DIR = os.path.join(
+    Path(os.path.dirname(os.path.abspath(__file__))), 'data')

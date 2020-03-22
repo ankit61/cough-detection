@@ -4,7 +4,7 @@ import torch
 import constants
 
 class BaseResNetRunner(BaseRunner):
-    def __init__(self, net, input_index):
+    def __init__(self, net, input_index=None):
         self.input_idx = input_index
         loss_fn = nn.BCEWithLogitsLoss()
         if torch.cuda.is_available():
@@ -19,11 +19,14 @@ class BaseResNetRunner(BaseRunner):
             should_minimize_best_metric=True
         )
 
+    def do_forward_pass(self, batch):
+        return self.nets[0](batch[self.input_idx]).squeeze(dim=1)
+    
     def train_batch_and_get_metrics(self, batch):
         #forward pass
-        pred = self.nets[0](batch[self.input_idx]).squeeze(dim=1)
+        pred = self.do_forward_pass(batch)
         loss = self.loss_fn(pred, batch[2].float())
-        acc = self.get_accuracy(pred, batch[2])
+        acc  = self.get_accuracy(pred, batch[2])
 
         #backward pass
         self.optimizers[0].zero_grad()
@@ -36,9 +39,9 @@ class BaseResNetRunner(BaseRunner):
 
     def test_batch_and_get_metrics(self, batch):
         #forward pass
-        pred = self.nets[0](batch[self.input_idx]).squeeze()
+        pred = self.do_forward_pass(batch)
         loss = self.loss_fn(pred, batch[2])
-        acc = self.get_accuracy(pred, batch[2])
+        acc  = self.get_accuracy(pred, batch[2])
 
         return [('loss', loss.mean().item()), ('acc', acc)]
 
