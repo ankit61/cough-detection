@@ -27,6 +27,7 @@ class BaseResNetRunner(BaseRunner):
         pred = self.do_forward_pass(batch)
         loss = self.loss_fn(pred, batch[2].float())
         acc  = self.get_accuracy(pred, batch[2])
+        print(pred.tolist())
         print((pred > 0).tolist())
         print('<---------->')
         pred_01_rate = (pred < 0).sum() / pred.numel()
