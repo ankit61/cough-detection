@@ -27,7 +27,7 @@ STD                         = [0.22181073012818833, 0.22090722034374521, 0.21610
 MIN_LEARNING_RATE           = 0.000001
 
 TENSORBOARDX_BASE_DIR = os.path.join(
-    Path(os.path.dirname(os.path.abspath(__file__))).parent, os.path.join('runs', datetime.now().strftime('%b%d_%H-%M-%S') + '_' + getpass.getuser()))
+    Path(os.path.dirname(os.path.abspath(__file__))), os.path.join('runs', datetime.now().strftime('%b%d_%H-%M-%S') + '_' + getpass.getuser()))
 MODELS_BASE_DIR = os.path.join(
-    Path(os.path.dirname(os.path.abspath(__file__))).parent, 'models')
+    Path(os.path.dirname(os.path.abspath(__file__))), 'models')
 DATA_BASE_DIR = '/media/sf_data'
