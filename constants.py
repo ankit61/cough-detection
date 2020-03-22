@@ -8,6 +8,7 @@ NUM_CLASSES                 = 1
 
 PRINT_FREQ                  = 20
 INTERMITTENT_OUTPUT_FREQ    = 5 # Num batches between outputs
+SAVE_FREQ                   = 5
 
 #HYPERPARAMETERS
 BATCH_SIZE                  = 1

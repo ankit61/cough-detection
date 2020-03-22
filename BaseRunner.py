@@ -92,7 +92,7 @@ class BaseRunner(metaclass=ABCMeta):
                 if param.grad is not None:
                     param_distribution_tag = f'{net.__class__.__name__}/{name_prefix}/{param_name}'
                     self.writer.add_scalar(param_distribution_tag, torch.norm(param.grad), global_step=global_step)
-    
+
     def output_weight_norms(self, global_step, name_prefix="training_weight_norms"):
         if not self.introspect:
             return
@@ -188,6 +188,17 @@ class BaseRunner(metaclass=ABCMeta):
                         )
                         self.best_metric_val = self.best_meter.avg
                 self.best_meter.reset()
+            elif epoch % constants.SAVE_FREQ == 0:
+                for i in range(len(self.nets)):
+                    torch.save({
+                        'arch': self.nets[i].__class__.__name__ + self.model_code,
+                        'state_dict': self.nets[i].state_dict(),
+                        'best_metric_val': self.best_meter.avg,
+                        'best_metric_name': self.best_metric_name
+                        }, os.path.join(constants.MODELS_BASE_DIR,
+                            self.nets[i].__class__.__name__ + self.model_code + '_' + \
+                            'checkpoint_' + str(epoch + 1) + '.pth')
+                    )
 
         for i in range(len(self.lr_schedulers)):
             if(min(self.lr_schedulers[i].get_lr()) >=\
