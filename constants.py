@@ -14,7 +14,7 @@ SAVE_FREQ                   = 5
 BATCH_SIZE                  = 32
 EPOCHS                      = 300
 LR                          = 0.05
-WEIGHT_DECAY                = 0
+WEIGHT_DECAY                = 4e-4
 
 #DATASET
 CHUNK_SIZE                  = 1
