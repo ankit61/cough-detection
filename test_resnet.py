@@ -26,7 +26,11 @@ elif args.runner == 'resnet':
 else:
     runner = ResNet3DRunner(load_paths=[args.load_path])
 
-data_loader = DataLoader(dataset, batch_size=constants.BATCH_SIZE, shuffle=True)
+data_loader = DataLoader(
+    dataset, 
+    batch_size=constants.BATCH_SIZE, 
+    shuffle=(args.mode == 'train')
+)
 if args.mode == 'train':
     runner.train(data_loader, constants.EPOCHS)
 else:
