@@ -11,7 +11,7 @@ INTERMITTENT_OUTPUT_FREQ    = 5 # Num batches between outputs
 SAVE_FREQ                   = 5
 
 #HYPERPARAMETERS
-BATCH_SIZE                  = 1
+BATCH_SIZE                  = 16
 EPOCHS                      = 300
 LR                          = 0.05
 WEIGHT_DECAY                = 0
