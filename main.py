@@ -37,11 +37,14 @@ data_loader = DataLoader(
     batch_size=constants.BATCH_SIZE, 
     shuffle=True
 )
+
 if args.mode == 'train':
     runner.train(data_loader, constants.EPOCHS)
 elif args.mode == 'test':
     runner.test(data_loader)
 else:
+    runner.nets[0].eval()
+
     file_output = {}
     graph_output = {}
 
