@@ -40,6 +40,7 @@ class CoughDataset(Dataset):
     def __init__(self, root_dir = constants.DATA_BASE_DIR, chunk_size = constants.CHUNK_SIZE):
         fs = [f for f in os.listdir(root_dir) if f.endswith('op_rs.mp4')]
         self.data = []
+        self.meta = []
         labels = json.loads(open(os.path.join(root_dir, 'labels.json'), 'r').read())
 
         self.audio_transforms = IT.Compose([
@@ -58,8 +59,9 @@ class CoughDataset(Dataset):
 
         for f in fs:
             #break in 1 sec chunks and add label
-            chunks = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, f[:-10] + '_rs.mp4'),  labels[f], chunk_size)
+            chunks, meta = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, f[:-10] + '_rs.mp4'),  labels[f], chunk_size)
             self.data += chunks
+            self.meta += meta
 
     def __len__(self):
         return len(self.data)
@@ -70,6 +72,12 @@ class CoughDataset(Dataset):
 
         return self.data[idx]
 
+    def get_meta(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        return self.meta[idx]
+    
     def break_in_chunks(self, video_file, audio_file, cough_times, chunk_size):
         v = io.read_video(video_file, pts_unit='sec')[0]
         a = io.read_video(audio_file, pts_unit='sec')[1]
@@ -77,6 +85,7 @@ class CoughDataset(Dataset):
         v = v.permute([0, 3, 1, 2])
 
         ans = []
+        meta = []
         #break into chunks
         end_frame = int(v.shape[0] / constants.VIDEO_FPS) * constants.VIDEO_FPS
         vid_range = range(0, end_frame, constants.VIDEO_FPS)
@@ -93,4 +102,6 @@ class CoughDataset(Dataset):
                 (v_chunk.permute([1, 0, 2, 3]), a_chunk, 1 if i in cough_times else 0)
             )
 
-        return ans
+            meta.append((video_file, i))
+
+        return ans, meta
