@@ -50,7 +50,7 @@ else:
         if torch.cuda.is_available():
             inp[0] = inp[0].cuda()
             inp[1] = inp[1].cuda()
-        prob = runner.do_forward_pass(inp).sigmoid().item()
+        prob = runner.do_forward_pass(inp)#.sigmoid().item()
         print(prob)
         original_file, interval = dataset.get_meta(i)
         
@@ -67,7 +67,7 @@ else:
 
     print(graph_output)
     print(file_output)
-    
+
     for f in graph_output:
         out_file = f.split('.')[0] + '.json'
         json.dump(file_output[f], open(out_file, 'w'))
