@@ -1,3 +1,7 @@
 torchaudio
 tensorboardX
 av
+torch
+torchvision
+matplotlib
+numpy
