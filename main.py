@@ -47,7 +47,8 @@ else:
     runner.nets[0].eval()
 
     file_output = {}
-    graph_output = {}
+    prob_graph_output = {}
+    label_graph_output = {}
 
     for i in range(len(dataset)):
         inp = [dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0)]
@@ -58,31 +59,47 @@ else:
         original_file, interval = dataset.get_meta(i)
         
         if original_file in file_output:
-            if prob > 0.5:
-                file_output[original_file]['coughing'].append(interval)
-            graph_output[original_file].append([interval[0], prob])
-            graph_output[original_file].append([interval[1], prob])
-        else:
-            if prob > 0.5:
-                file_output[original_file] = {'coughing': [interval]}
-            else:
-                 file_output[original_file] = {'coughing': []}
-            graph_output[original_file] = [[interval[0], prob], [interval[1], prob]]
+            file_output[original_file]['coughing'].append([interval[0], prob])
+            
+            prob_graph_output[original_file].append([interval[0], prob])
+            prob_graph_output[original_file].append([interval[1], prob])
 
-    for f in graph_output:
+            label_graph_output[original_file].append([interval[0], 1 if prob > 0.5 else 0])
+            label_graph_output[original_file].append([interval[1], 1 if prob > 0.5 else 0])
+        else:
+            file_output[original_file] = {'coughing': [interval[0], prob]}
+            
+            prob_graph_output[original_file] = [[interval[0], prob], [interval[1], prob]]
+            
+            label_graph_output[original_file] = [[interval[0], 1 if prob > 0.5 else 0], [interval[1], 1 if prob > 0.5 else 0]]
+
+    matplotlib.use('Agg') # to avoid displaying figure
+    for f in prob_graph_output:
+        #make json
         out_file = f.split('.')[0] + '.json'
-        fig_file = f.split('.')[0] + '.png'
         json.dump(file_output[f], open(out_file, 'w'))
         print('Saving ' + out_file + '...')
 
-        graph = np.array(graph_output[f])
-        matplotlib.use('Agg')
+        #make probability figure
+        fig_file = f.split('.')[0] + '_prob.png'
+        graph = np.array(prob_graph_output[f])
         fig = plt.figure()
         plt.plot(graph[:, 0], graph[:, 1], '.-')
         plt.xlabel('time')
         plt.ylabel('probability of coughing')
         plt.ylim([0, 1])
         plt.savefig(fig_file)
-        print('Saving ' + fig_file + '...')
         plt.close(fig)
-        
+        print('Saving ' + fig_file + '...')
+
+        #make label figure
+        fig_file = f.split('.')[0] + '_label.png'
+        graph = np.array(label_graph_output[f])
+        fig = plt.figure()
+        plt.plot(graph[:, 0], graph[:, 1], '-')
+        plt.xlabel('time')
+        plt.ylabel('coughing label')
+        plt.ylim([0, 1])
+        plt.savefig(fig_file)
+        plt.close(fig)
+        print('Saving ' + fig_file + '...')
