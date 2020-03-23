@@ -45,7 +45,7 @@ else:
     graph_output = {}
     
     for i in range(len(dataset)):
-        inp = dataset[i].unsqueeze(dim=0)
+        inp = (dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0))
         prob = runner.do_forward_pass(inp[i]).sigmoid().item()
         original_file, interval = dataset.get_meta(i)
         if original_file in file_output:
