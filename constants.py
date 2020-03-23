@@ -22,8 +22,8 @@ AUDIO_SAMPLE_RATE           = 48000
 RESAMPLED_AUDIO_SAMPLE_RATE = 16000
 INPUT_FRAME_WIDTH           = 224
 VIDEO_FPS                   = 30
-MEAN                        = [0.6226, 0.6329, 0.6279]
-STD                         = [0.22181073012818833, 0.22090722034374521, 0.21610182784974308]
+MEAN                        = [0.0059, 0.0051, 0.0042]
+STD                         = [0.0474, 0.0456, 0.0358]
 
 MIN_LEARNING_RATE           = 0.000001
 

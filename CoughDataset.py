@@ -34,7 +34,7 @@ class NormalizeAudio:
         pass
     
     def __call__(self, a):
-        return a.div(1<<31)
+        return a.div(a.abs().max().item())
 
 class CoughDataset(Dataset):
     def __init__(self, root_dir = constants.DATA_BASE_DIR, chunk_size = constants.CHUNK_SIZE):
