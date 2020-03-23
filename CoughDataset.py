@@ -37,11 +37,15 @@ class NormalizeAudio:
         return a.div(a.abs().max().item())
 
 class CoughDataset(Dataset):
-    def __init__(self, root_dir = constants.DATA_BASE_DIR, chunk_size = constants.CHUNK_SIZE):
+    def __init__(self, root_dir = constants.DATA_BASE_DIR, result_mode = False, chunk_size = constants.CHUNK_SIZE):
+        
+        assert chunk_size == 1, 'current implementation only supports 1 second chunks'
+
         fs = [f for f in os.listdir(root_dir) if f.endswith('op_rs.mp4')]
         self.data = []
         self.meta = []
-        labels = json.loads(open(os.path.join(root_dir, 'labels.json'), 'r').read())
+        if not result_mode:
+            labels = json.loads(open(os.path.join(root_dir, 'labels.json'), 'r').read())
 
         self.audio_transforms = IT.Compose([
             ReduceAudioChannels(),
@@ -59,7 +63,7 @@ class CoughDataset(Dataset):
 
         for f in fs:
             #break in 1 sec chunks and add label
-            chunks, meta = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, f[:-10] + '_rs.mp4'),  labels[f], chunk_size)
+            chunks, meta = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, f[:-10] + '_rs.mp4'),  [] if result_mode else labels[f], chunk_size)
             self.data += chunks
             self.meta += meta
 

@@ -19,7 +19,7 @@ parser.add_argument('--runner', '-r', default='multistream', choices=['multistre
 parser.add_argument('--data-dir', '-d', default=constants.DATA_BASE_DIR)
 args =  parser.parse_args()
 
-dataset = CoughDataset(root_dir=args.data_dir)
+dataset = CoughDataset(root_dir=args.data_dir, result_mode=(args.mode == 'gen_result'))
 
 if not args.load_path:
     load_paths = None
