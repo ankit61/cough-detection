@@ -79,7 +79,7 @@ else:
         graph = np.array(graph_output[f])
         matplotlib.use('Agg')
         fig = plt.figure()
-        plt.plot(graph[:, 0], graph[:, 1])
+        plt.plot(graph[:, 0], graph[:, 1], '.-')
         plt.xlabel('time')
         plt.ylabel('probability of coughing')
         plt.ylim([0, 1])
