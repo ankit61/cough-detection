@@ -61,12 +61,13 @@ else:
             if prob > 0.5:
                 file_output[original_file]['coughing'].append(interval)
             graph_output[original_file].append([interval[0], prob])
+            graph_output[original_file].append([interval[1], prob])
         else:
             if prob > 0.5:
                 file_output[original_file] = {'coughing': [interval]}
             else:
                  file_output[original_file] = {'coughing': []}
-            graph_output[original_file] = [[interval[0], prob]]
+            graph_output[original_file] = [[interval[0], prob], [interval[1], prob]]
 
     for f in graph_output:
         out_file = f.split('.')[0] + '.json'
