@@ -6,6 +6,7 @@ import argparse
 import constants
 from torch.utils.data import DataLoader
 import json
+import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
