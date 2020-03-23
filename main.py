@@ -46,7 +46,7 @@ else:
     
     for i in range(len(dataset)):
         inp = (dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0))
-        prob = runner.do_forward_pass(inp[i]).sigmoid().item()
+        prob = runner.do_forward_pass(inp).sigmoid().item()
         original_file, interval = dataset.get_meta(i)
         if original_file in file_output:
             if prob > 0.5:

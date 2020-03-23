@@ -102,6 +102,6 @@ class CoughDataset(Dataset):
                 (v_chunk.permute([1, 0, 2, 3]), a_chunk, 1 if i in cough_times else 0)
             )
 
-            meta.append((video_file, i))
+            meta.append((video_file, [i, i + 1]))
 
         return ans, meta
