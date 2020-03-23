@@ -9,6 +9,7 @@ import json
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 
 parser = argparse.ArgumentParser('arg parser')
 
@@ -76,7 +77,7 @@ else:
         json.dump(file_output[f], open(out_file, 'w'))
 
         graph = np.array(graph_output[f])
-        plt.ioff()
+        matplotlib.use('Agg')
         fig = plt.figure()
         plt.plot(graph[:, 0], graph[:, 1])
         plt.xlabel('time')
