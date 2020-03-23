@@ -44,14 +44,16 @@ elif args.mode == 'test':
 else:
     file_output = {}
     graph_output = {}
-    
+
     for i in range(len(dataset)):
         inp = [dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0)]
         if torch.cuda.is_available():
             inp[0] = inp[0].cuda()
             inp[1] = inp[1].cuda()
         prob = runner.do_forward_pass(inp).sigmoid().item()
+        print(prob)
         original_file, interval = dataset.get_meta(i)
+        
         if original_file in file_output:
             if prob > 0.5:
                 file_output[original_file]['coughing'].append(interval)
@@ -63,6 +65,9 @@ else:
                  file_output[original_file] = {'coughing': []}
             graph_output[original_file] = [[interval[0], prob]]
 
+    print(graph_output)
+    print(file_output)
+    
     for f in graph_output:
         out_file = f.split('.')[0] + '.json'
         json.dump(file_output[f], open(out_file, 'w'))

@@ -25,8 +25,6 @@ class BaseResNetRunner(BaseRunner):
     
     def get_metrics(self, batch):
         pred = self.do_forward_pass(batch)
-        print(pred.tolist())
-        print(batch[2].tolist())
         loss = self.loss_fn(pred, batch[2].float())
         acc  = self.get_accuracy(pred, batch[2])
         pred_min = pred.min().item()
