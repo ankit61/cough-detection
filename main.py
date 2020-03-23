@@ -55,7 +55,6 @@ else:
             inp[0] = inp[0].cuda()
             inp[1] = inp[1].cuda()
         prob = runner.do_forward_pass(inp).sigmoid().item()
-        print(prob)
         original_file, interval = dataset.get_meta(i)
         
         if original_file in file_output:
@@ -69,12 +68,11 @@ else:
                  file_output[original_file] = {'coughing': []}
             graph_output[original_file] = [[interval[0], prob]]
 
-    print(graph_output)
-    print(file_output)
-
     for f in graph_output:
         out_file = f.split('.')[0] + '.json'
+        fig_file = f.split('.')[0] + '.png'
         json.dump(file_output[f], open(out_file, 'w'))
+        print('Saving ' + out_file + '...')
 
         graph = np.array(graph_output[f])
         matplotlib.use('Agg')
@@ -83,6 +81,7 @@ else:
         plt.xlabel('time')
         plt.ylabel('probability of coughing')
         plt.ylim([0, 1])
-        plt.savefig(f.split('.')[0] + '.png')
+        plt.savefig(fig_file)
+        print('Saving ' + fig_file + '...')
         plt.close(fig)
         
