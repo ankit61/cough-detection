@@ -45,7 +45,10 @@ else:
     graph_output = {}
     
     for i in range(len(dataset)):
-        inp = (dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0))
+        inp = [dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0)]
+        if torch.cuda.is_available():
+            inp[0] = inp[0].cuda()
+            inp[1] = inp[1].cuda()
         prob = runner.do_forward_pass(inp).sigmoid().item()
         original_file, interval = dataset.get_meta(i)
         if original_file in file_output:
@@ -57,7 +60,7 @@ else:
                 file_output[original_file] = {'coughing': [interval]}
             else:
                  file_output[original_file] = {'coughing': []}
-            graph_output[original_file] = [interval[0], prob]
+            graph_output[original_file] = [[interval[0], prob]]
 
     for f in graph_output:
         out_file = f.split('.')[0] + '.json'
@@ -67,6 +70,9 @@ else:
         plt.ioff()
         fig = plt.figure()
         plt.plot(graph[:, 0], graph[:, 1])
+        plt.xlabel('time')
+        plt.ylabel('probability of coughing')
+        plt.ylim([0, 1])
         plt.savefig(f.split('.')[0] + '.png')
         plt.close(fig)
         
