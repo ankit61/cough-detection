@@ -9,7 +9,7 @@ class BaseResNetRunner(BaseRunner):
         loss_fn = nn.BCEWithLogitsLoss()
         if torch.cuda.is_available():
             net = net.cuda()
-        optimizers = [torch.optim.Adam(net.parameters(), lr=constants.LR, weight_decay=constants.WEIGHT_DECAY)]
+        optimizers = [torch.optim.SGD(net.parameters(), lr=constants.LR, momentum=constants.MOMENTUM, weight_decay=constants.WEIGHT_DECAY)]
 
         super(BaseResNetRunner, self).__init__(
             [net], 

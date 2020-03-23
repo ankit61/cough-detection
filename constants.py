@@ -15,6 +15,7 @@ BATCH_SIZE                  = 32
 EPOCHS                      = 300
 LR                          = 0.01
 WEIGHT_DECAY                = 4e-4
+MOMENTUM                    = 0.9
 
 #DATASET
 CHUNK_SIZE                  = 1
