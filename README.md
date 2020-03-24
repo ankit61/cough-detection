@@ -9,7 +9,6 @@ Run the following commands to set up the environment for running:
 git clone https://github.com/ankit61/cough-detection.git
 cd cough-detection/
 mkdir runs
-mkdir models
 
 #install dependencies
 sudo add-apt-repository -y ppa:savoury1/ffmpeg4
@@ -54,3 +53,10 @@ Note again that ```YOUR_DATA_DIR``` must have videos named in the same format as
 ```
 
 This ```labels.json``` indicates that there was coughing in ```file1_v.mp4``` between 1 - 2, 2 - 3, 3 - 4 seconds. Similarly, there was coughing in ```file2_v.mp4``` between 1 - 2 seconds and there was no coughing in ```file3_v.mp4```.
+
+
+## YouTube Videos
+
+Sample videos playlist: https://www.youtube.com/playlist?list=PLzTd-IE8CXpX3N-rEbUMjfIlHXNDH-90S
+
+Video explaining how to run: https://youtu.be/rjIhN_peG4c
