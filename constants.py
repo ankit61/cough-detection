@@ -25,6 +25,8 @@ INPUT_FRAME_WIDTH           = 224
 VIDEO_FPS                   = 30
 MEAN                        = [0.0059, 0.0051, 0.0042]
 STD                         = [0.0474, 0.0456, 0.0358]
+VISUAL_SUFFIX               = '_v.mp4'
+AUDIO_SUFFIX                = '_a.mp4'
 
 MIN_LEARNING_RATE           = 0.000001
 

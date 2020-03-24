@@ -41,7 +41,7 @@ class CoughDataset(Dataset):
         
         assert chunk_size == 1, 'current implementation only supports 1 second chunks'
 
-        fs = [f for f in os.listdir(root_dir) if f.endswith('op_rs.mp4')]
+        fs = [f for f in os.listdir(root_dir) if f.endswith(constants.VISUAL_SUFFIX)]
         self.data = []
         self.meta = []
         if not result_mode:
@@ -63,7 +63,8 @@ class CoughDataset(Dataset):
 
         for f in fs:
             #break in 1 sec chunks and add label
-            chunks, meta = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, f[:-10] + '_rs.mp4'),  [] if result_mode else labels[f], chunk_size)
+            audio_file = f[:-len(constants.VISUAL_SUFFIX)] + constants.AUDIO_SUFFIX
+            chunks, meta = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, audio_file),  [] if result_mode else labels[f], chunk_size)
             self.data += chunks
             self.meta += meta
 
