@@ -1,5 +1,7 @@
 # cough-detection
 
+This is a repository to detect the act of "coughing" using deep learning. The input to the model is a video, and the output is the probability that there was "coughing" in the video. As shown below, a probability-time graph can also be generated for better understanding.
+
 ## Instructions to run
 
 Run the following commands to set up the environment for running:
@@ -32,6 +34,8 @@ python3 main.py --mode gen_result --data-dir YOUR_DATA_DIR --load-path models/Mu
 ```
 
 You must follow the file naming conventions inside ```YOUR_DATA_DIR```. You must first use [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to extract body landmarks for your videos. Then, the video with the body landmarks must be suffixed with ```_v.mp4``` and the original video must be suffixed by ```_a.mp4```. For example, if you want to run the code on ```YOUR_VIDEO.mp4```, then you must generate body landmarks and save them in ```YOUR_VIDEO_v.mp4``` and rename the original video ```YOUR_VIDEO_a.mp4```. The visual features would be extracted from the ```*_v.mp4``` videos and the audio features will be extracted from ```*_a.mp4```.
+
+Running the above command would produce a ```YOUR_VIDEO_v.json```, ```YOUR_VIDEO_v_label.png```, ```YOUR_VIDEO_v_prob.png``` for every video in ```YOUR_DATA_DIR```. ```YOUR_VIDEO_v_label.png``` is a predicted label vs time graph and ```YOUR_VIDEO_v_prob.png``` is a probability vs time graph.
 
 If you want to train or test the model, you can use the following command:
 ```bash
