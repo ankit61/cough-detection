@@ -7,7 +7,7 @@ def get_visual_model():
     from torchvision.models import resnet18
 
     net = resnet18(pretrained=True)
-    net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    net.conv1 = nn.Conv2d(constants.VIDEO_FPS * constants.CHUNK_SIZE, 64, kernel_size=7, stride=2, padding=3, bias=False)
     net.bn1 = nn.BatchNorm2d(64)
 
     return net
