@@ -10,28 +10,29 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+import os
 
 parser = argparse.ArgumentParser('arg parser')
 
 parser.add_argument('--mode', '-m', default='train', choices=['train', 'test', 'gen_result'])
 parser.add_argument('--load-path', '-lp', default='')
-parser.add_argument('--runner', '-r', default='multistream', choices=['multistream', 'resnet3d', 'resnet'])
 parser.add_argument('--data-dir', '-d', default=constants.DATA_BASE_DIR)
+if os.path.exists(os.path.join(constants.DATA_BASE_DIR, 'test')):
+    parser.add_argument('--test-dir', '-t', default=os.path.join(constants.DATA_BASE_DIR, 'test'))
+else:
+    parser.add_argument('--test-dir', '-t', default='')
+
 args =  parser.parse_args()
 
 dataset = CoughDataset(root_dir=args.data_dir, result_mode=(args.mode == 'gen_result'))
+test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'gen_result'))
 
 if not args.load_path:
     load_paths = None
 else:
     load_paths = [args.load_path]
 
-if args.runner == 'multistream':
-    runner = MultiStreamDNNRunner(load_paths=load_paths)
-elif args.runner == 'resnet':
-    runner = ResNetRunner(load_paths=load_paths)
-else:
-    runner = ResNet3DRunner(load_paths=load_paths)
+runner = MultiStreamDNNRunner(load_paths=load_paths)
 
 data_loader = DataLoader(
     dataset, 
@@ -39,8 +40,14 @@ data_loader = DataLoader(
     shuffle=True
 )
 
+test_loader = DataLoader(
+    test_dataset, 
+    batch_size=constants.BATCH_SIZE, 
+    shuffle=True
+)
+
 if args.mode == 'train':
-    runner.train(data_loader, constants.EPOCHS)
+    runner.train(data_loader, constants.EPOCHS, val_loader=test_loader)
 elif args.mode == 'test':
     runner.test(data_loader)
 else:
