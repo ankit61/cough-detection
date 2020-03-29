@@ -17,6 +17,7 @@ class MultiStreamDNN(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(video_features_len, 256),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(256, 1)
         )
 
