@@ -2,6 +2,7 @@ from ResNet3DRunner import get_visual_model
 from ResNetRunner import get_audio_model
 import torch.nn as nn
 import torch
+import constants
 
 class MultiStreamDNN(nn.Module):
     def __init__(self):
@@ -17,7 +18,7 @@ class MultiStreamDNN(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(video_features_len, 256),
             nn.ReLU(),
-            nn.Dropout(),
+            nn.Dropout(constants.DROPOUT_PROB),
             nn.Linear(256, 1)
         )
 
