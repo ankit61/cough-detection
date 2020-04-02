@@ -90,25 +90,23 @@ class CoughDataset(Dataset):
         return self.meta[idx]
     
     def break_in_chunks(self, video_file, audio_file, cough_times, chunk_size):
-        v, _, meta = io.read_video(video_file, pts_unit='sec')
+        v = io.read_video(video_file, pts_unit='sec')[0]
         a = io.read_video(audio_file, pts_unit='sec')[1]
-
-        video_fps = round(meta['video_fps'] / constants.VIDEO_FPS_FACTOR) *  constants.VIDEO_FPS_FACTOR
 
         v = v.permute([0, 3, 1, 2])
 
         ans = []
         meta = []
         #break into chunks
-        end_frame = int(v.shape[0] / video_fps) * video_fps
-        vid_range = range(0, end_frame, video_fps)
+        end_frame = int(v.shape[0] / constants.VIDEO_FPS) * constants.VIDEO_FPS
+        vid_range = range(0, end_frame, constants.VIDEO_FPS)
 
         end_audio_frame = int(a.shape[1] / constants.AUDIO_SAMPLE_RATE) * constants.AUDIO_SAMPLE_RATE
         audio_range = range(0, end_audio_frame, constants.AUDIO_SAMPLE_RATE)
 
         for i, (v_frame, a_frame) in enumerate(zip(vid_range, audio_range)): 
             #apply transforms
-            v_chunk = self.video_transforms(v[v_frame:v_frame + video_fps])
+            v_chunk = self.video_transforms(v[v_frame:v_frame + constants.VIDEO_FPS])
             a_chunk = self.audio_transforms(a[:, a_frame:a_frame + constants.AUDIO_SAMPLE_RATE])
 
             v_chunk = v_chunk.permute([1, 0, 2, 3])
