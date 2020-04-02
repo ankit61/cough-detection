@@ -17,9 +17,8 @@ class MultiStreamDNN(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(video_features_len, 256),
             nn.ReLU(),
-            nn.Linear(256, 64),
-            nn.ReLU(),
-            nn.Linear(64, 1)
+            nn.Dropout(),
+            nn.Linear(256, 1)
         )
 
     def forward(self, visual_stream, audio_stream):

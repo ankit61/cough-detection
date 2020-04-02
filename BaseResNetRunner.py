@@ -30,7 +30,7 @@ class BaseResNetRunner(BaseRunner):
         pred_min = pred.min().item()
         pred_max = pred.max().item()
         pred_std  = pred.std().item()
-        pred_01_rate = (pred < 0).sum() / pred.numel()
+        pred_01_rate = (pred < 0).float().sum() / pred.numel()
         gt_01_rate  = (batch[2] < 1).float().sum() / batch[2].numel()
 
         return loss, [

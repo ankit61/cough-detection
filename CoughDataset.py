@@ -68,6 +68,12 @@ class CoughDataset(Dataset):
             self.data += chunks
             self.meta += meta
 
+        self.print_data_stats()
+
+    def print_data_stats(self):
+        print('Printing data statistics...')
+        print('Positive Label Rate:', sum([l for _, _, l in self.data]) / len(self.data))
+
     def __len__(self):
         return len(self.data)
 
@@ -102,9 +108,12 @@ class CoughDataset(Dataset):
             #apply transforms
             v_chunk = self.video_transforms(v[v_frame:v_frame + constants.VIDEO_FPS])
             a_chunk = self.audio_transforms(a[:, a_frame:a_frame + constants.AUDIO_SAMPLE_RATE])
-            
+
+            v_chunk = v_chunk.permute([1, 0, 2, 3])
+            v_chunk = torch.cat(list(v_chunk.unbind(1)), dim=0)
+
             ans.append(
-                (v_chunk.permute([1, 0, 2, 3]), a_chunk, 1 if i in cough_times else 0)
+                (v_chunk, a_chunk, 1 if i in cough_times else 0)
             )
 
             meta.append((os.path.basename(video_file), [i, i + 1]))
