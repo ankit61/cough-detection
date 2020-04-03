@@ -10,7 +10,6 @@ Run the following commands to set up the environment for running:
 #clone and set up
 git clone https://github.com/ankit61/cough-detection.git
 cd cough-detection/
-mkdir runs
 
 #install dependencies
 sudo add-apt-repository -y ppa:savoury1/ffmpeg4
@@ -61,6 +60,8 @@ This ```labels.json``` indicates that there was coughing in ```file1_v.mp4``` be
 
 ## YouTube Videos
 
-Sample videos playlist: https://www.youtube.com/playlist?list=PLzTd-IE8CXpX3N-rEbUMjfIlHXNDH-90S
+Sample videos playlist: 
+ - Submission 1: https://www.youtube.com/playlist?list=PLzTd-IE8CXpX3N-rEbUMjfIlHXNDH-90S
+ - Submission 2: https://www.youtube.com/playlist?list=PLzTd-IE8CXpWKQMGInhXw3QRCfXQwJsNl
 
-Video explaining how to run: https://youtu.be/rjIhN_peG4c
+Video explaining how to run: 
