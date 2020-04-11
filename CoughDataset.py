@@ -110,7 +110,7 @@ class CoughDataset(Dataset):
             a_chunk = self.audio_transforms(a[:, a_frame:a_frame + constants.AUDIO_SAMPLE_RATE])
 
             v_chunk = v_chunk.permute([1, 0, 2, 3])
-            v_chunk = torch.cat(list(v_chunk.unbind(1)), dim=0)
+            #v_chunk = torch.cat(list(v_chunk.unbind(1)), dim=0)
 
             ans.append(
                 (v_chunk, a_chunk, 1 if i in cough_times else 0)
