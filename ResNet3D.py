@@ -122,7 +122,7 @@ class ResNet(nn.Module):
         self.conv1 = nn.Conv3d(
             3,
             64,
-            kernel_size=[constants.FRAME_3D_CONVS, 7, 7],
+            kernel_size=7,
             stride=(1, 2, 2),
             padding=(3, 3, 3),
             bias=False)
