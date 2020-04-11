@@ -17,6 +17,7 @@ LR                          = 0.01
 WEIGHT_DECAY                = 4e-4
 MOMENTUM                    = 0.9
 DROPOUT_PROB                = 0.5
+FRAME_3D_CONVS              = 10
 
 #DATASET
 CHUNK_SIZE                  = 1
