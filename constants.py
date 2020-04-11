@@ -13,7 +13,7 @@ SAVE_FREQ                   = 5
 #HYPERPARAMETERS
 BATCH_SIZE                  = 32
 EPOCHS                      = 300
-LR                          = 0.01
+LR                          = 0.005
 WEIGHT_DECAY                = 4e-4
 MOMENTUM                    = 0.9
 DROPOUT_PROB                = 0.5
