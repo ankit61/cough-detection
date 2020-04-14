@@ -1,14 +1,8 @@
-from ResNet3D import resnet10
 from BaseResNetRunner import BaseResNetRunner
 import constants
 import torch.nn as nn
+from MultiStreamDNN import get_visual_model
 
-def get_visual_model():
-    return resnet10(
-            num_classes=constants.NUM_CLASSES, 
-            sample_duration=constants.VIDEO_FPS, 
-            sample_size=constants.INPUT_FRAME_WIDTH
-        )
 
 class ResNet3DRunner(BaseResNetRunner):
     def __init__(self, load_paths=None):

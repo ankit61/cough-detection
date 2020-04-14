@@ -1,8 +1,23 @@
-from ResNet3DRunner import get_visual_model
-from ResNetRunner import get_audio_model
+from torchvision.models import resnet18
+from ResNet3D import resnet10
 import torch.nn as nn
 import torch
 import constants
+
+def get_audio_model():
+    net = resnet18(pretrained=True)
+    net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    net.bn1 = nn.BatchNorm2d(64)
+    net.fc = nn.Linear(net.fc.in_features, constants.NUM_CLASSES)
+
+    return net
+
+def get_visual_model():
+    return resnet10(
+            num_classes=constants.NUM_CLASSES, 
+            sample_duration=constants.VIDEO_FPS, 
+            sample_size=constants.INPUT_FRAME_WIDTH
+        )
 
 class MultiStreamDNN(nn.Module):
     def __init__(self):
