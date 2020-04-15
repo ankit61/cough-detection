@@ -9,8 +9,9 @@ import torch
 from VATransforms import VideoTransform, ReduceAudioChannels, NormalizeAudio
 
 class CoughDataset(Dataset):
-    def __init__(self, root_dir = constants.DATA_BASE_DIR, result_mode = False, chunk_size = constants.CHUNK_SIZE):
+    def __init__(self, root_dir = constants.DATA_BASE_DIR, result_mode = False, chunk_size = constants.CHUNK_SIZE, model_type='all'):
 
+        assert models in ['all', 'conv3D_MFCCs', 'conv2D_MF']
         assert chunk_size == 1, 'current implementation only supports 1 second chunks'
 
         fs = [f for f in os.listdir(root_dir) if f.endswith(constants.VISUAL_SUFFIX)]
@@ -59,6 +60,17 @@ class CoughDataset(Dataset):
             lambda x : x,
             lambda x : x
         ]
+
+        if model_type == 'conv3D_MFCCS':
+            del self.ensemble_video_transforms[1]
+            del self.ensemble_audio_transforms[1]
+            del self.ensemble_video_post_transforms[1]
+            del self.ensemble_audio_post_transforms[1]
+        elif model_type == 'conv2D_MF':
+            del self.ensemble_video_transforms[0]
+            del self.ensemble_audio_transforms[0]
+            del self.ensemble_video_post_transforms[0]
+            del self.ensemble_audio_post_transforms[0]
 
         for f in fs:
             #break in 1 sec chunks and add label

@@ -7,17 +7,35 @@ from MultiStreamDNN import get_audio_model, get_visual_model_conv2D, get_visual_
 import torch.nn as nn
 
 class EnsembleModelRunner(BaseRunner):
-    def __init__(self, load_paths):
-        nets = [
-            MultiStreamDNN(            
-                get_visual_model_conv3D(),
-                get_audio_model()
-            ),
-            MultiStreamDNN(
-                get_visual_model_conv2D(),
-                get_audio_model()
-            )
-        ]
+    def __init__(self, load_paths, model_type='all'):
+        
+        assert models in ['all', 'conv3D_MFCCs', 'conv2D_MF']
+
+        if models == 'all':
+            nets = [
+                MultiStreamDNN(            
+                    get_visual_model_conv3D(),
+                    get_audio_model()
+                ),
+                MultiStreamDNN(
+                    get_visual_model_conv2D(),
+                    get_audio_model()
+                )
+            ]
+        elif models == 'conv3D_MFCCs':
+            nets = [
+                MultiStreamDNN(            
+                    get_visual_model_conv3D(),
+                    get_audio_model()
+                )
+            ]
+        elif models == 'conv2D_MF':
+            nets = [
+                MultiStreamDNN(
+                    get_visual_model_conv2D(),
+                    get_audio_model()
+                )
+            ]
 
         if torch.cuda.is_available():
             for i in range(len(nets)):
