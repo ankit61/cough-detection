@@ -72,7 +72,7 @@ class CoughDataset(Dataset):
 
     def print_data_stats(self):
         print('Printing data statistics...')
-        print('Positive Label Rate:', sum([l for _, _, l in self.data]) / len(self.data))
+        print('Positive Label Rate:', sum([data_tuple[-1] for data_tuple in self.data]) / len(self.data))
 
     def __len__(self):
         return len(self.data)
