@@ -45,7 +45,6 @@ class EnsembleModelRunner(BaseRunner):
             torch.optim.Adam(
                 nets[i].parameters(), 
                 lr=constants.ENSEMBLE_LRS[i], 
-                momentum=constants.ENSEMBLE_MOMENTUMS[i], 
                 weight_decay=constants.ENSEMBLE_WEIGHT_DECAYS[i]
             )
             for i in range(len(nets))
