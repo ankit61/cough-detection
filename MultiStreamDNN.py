@@ -37,7 +37,7 @@ class MultiStreamDNN(nn.Module):
         self.visual_model = visual_model
         self.audio_model = audio_model
 
-        video_features_len = self.audio_model.fc.in_features + self.visual_model.fc.in_features
+        video_features_len = constants.HOLISTIC_FEATURES_LEN
 
         self.mlp = nn.Sequential(
             nn.Linear(video_features_len, 256),

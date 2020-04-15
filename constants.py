@@ -18,6 +18,7 @@ WEIGHT_DECAY                = 4e-4
 MOMENTUM                    = 0.9
 DROPOUT_PROB                = 0.5
 FRAME_3D_CONVS              = 10
+HOLISTIC_FEATURES_LEN       = 1024
 
 #ENSEMBLE HYPERPARAMS
 ENSEMBLE_LRS                = [LR, LR]
