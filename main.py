@@ -26,7 +26,7 @@ else:
 args =  parser.parse_args()
 
 dataset = CoughDataset(root_dir=args.data_dir, result_mode=(args.mode == 'gen_result'), model_type=args.model_type)
-test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'gen_result'))
+test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'gen_result'), model_type=args.model_type)
 
 if not args.load_path:
     load_paths = None
