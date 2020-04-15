@@ -8,21 +8,26 @@ def get_audio_model():
     net = resnet18(pretrained=True)
     net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     net.bn1 = nn.BatchNorm2d(64)
-    net.fc = nn.Linear(net.fc.in_features, constants.NUM_CLASSES)
+    net.fc = nn.Sequential()
 
     return net
 
 def get_visual_model_conv3D():
-    return resnet10(
+    net = resnet10(
             num_classes=constants.NUM_CLASSES, 
             sample_duration=constants.VIDEO_FPS, 
             sample_size=constants.INPUT_FRAME_WIDTH
         )
 
+    net.fc = nn.Sequential()
+
+    return net
+
 def get_visual_model_conv2D():
     net = resnet18(pretrained=True)
     net.conv1 = nn.Conv2d(constants.VIDEO_FPS * constants.CHUNK_SIZE * 3, 64, kernel_size=7, stride=2, padding=3, bias=False)
     net.bn1 = nn.BatchNorm2d(64)
+    net.fc = nn.Sequential()
 
     return net
 
@@ -33,9 +38,6 @@ class MultiStreamDNN(nn.Module):
         self.audio_model = audio_model
 
         video_features_len = self.audio_model.fc.in_features + self.visual_model.fc.in_features
-
-        self.visual_model.fc = nn.Sequential()
-        self.audio_model.fc = nn.Sequential()
 
         self.mlp = nn.Sequential(
             nn.Linear(video_features_len, 256),
