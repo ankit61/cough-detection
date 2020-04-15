@@ -19,6 +19,11 @@ MOMENTUM                    = 0.9
 DROPOUT_PROB                = 0.5
 FRAME_3D_CONVS              = 10
 
+#ENSEMBLE HYPERPARAMS
+ENSEMBLE_LRS                = [LR, LR]
+ENSEMBLE_MOMENTUMS          = [MOMENTUM, MOMENTUM]
+ENSEMBLE_WEIGHT_DECAYS      = [WEIGHT_DECAY, WEIGHT_DECAY]
+
 #DATASET
 CHUNK_SIZE                  = 1
 AUDIO_SAMPLE_RATE           = 48000
