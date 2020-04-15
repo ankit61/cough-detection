@@ -61,7 +61,7 @@ class CoughDataset(Dataset):
             lambda x : x
         ]
 
-        if model_type == 'conv3D_MFCCS':
+        if model_type == 'conv3D_MFCCs':
             del self.ensemble_video_transforms[1]
             del self.ensemble_audio_transforms[1]
             del self.ensemble_video_post_transforms[1]
