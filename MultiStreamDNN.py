@@ -5,7 +5,7 @@ import torch
 import constants
 
 def get_audio_model():
-    net = resnet18(pretrained=True)
+    net = resnet18()
     net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     net.bn1 = nn.BatchNorm2d(64)
     net.fc = nn.Sequential()
@@ -24,7 +24,7 @@ def get_visual_model_conv3D():
     return net
 
 def get_visual_model_conv2D():
-    net = resnet18(pretrained=True)
+    net = resnet18()
     net.conv1 = nn.Conv2d(constants.VIDEO_FPS * constants.CHUNK_SIZE * 3, 64, kernel_size=7, stride=2, padding=3, bias=False)
     net.bn1 = nn.BatchNorm2d(64)
     net.fc = nn.Sequential()

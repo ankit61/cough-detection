@@ -11,7 +11,7 @@ INTERMITTENT_OUTPUT_FREQ    = 5 # Num batches between outputs
 SAVE_FREQ                   = 5
 
 #HYPERPARAMETERS
-BATCH_SIZE                  = 32
+BATCH_SIZE                  = 24
 EPOCHS                      = 300
 LR                          = 0.005
 WEIGHT_DECAY                = 4e-4
@@ -21,7 +21,7 @@ FRAME_3D_CONVS              = 10
 HOLISTIC_FEATURES_LEN       = 1024
 
 #ENSEMBLE HYPERPARAMS
-ENSEMBLE_LRS                = [LR, LR]
+ENSEMBLE_LRS                = [LR, 0.0001]
 ENSEMBLE_MOMENTUMS          = [MOMENTUM, MOMENTUM]
 ENSEMBLE_WEIGHT_DECAYS      = [WEIGHT_DECAY, WEIGHT_DECAY]
 

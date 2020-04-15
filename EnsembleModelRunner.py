@@ -42,7 +42,7 @@ class EnsembleModelRunner(BaseRunner):
                 nets[i] = nets[i].cuda()
 
         optimizers = [
-            torch.optim.SGD(
+            torch.optim.Adam(
                 nets[i].parameters(), 
                 lr=constants.ENSEMBLE_LRS[i], 
                 momentum=constants.ENSEMBLE_MOMENTUMS[i], 
