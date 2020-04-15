@@ -51,9 +51,7 @@ class EnsembleModelRunner(BaseRunner):
             loss, m = self.get_metrics(pred, batch[-1], get_original_loss=True)
 
             for j in range(len(m)):
-                m[j][0] = m[j][0] + '_' + str(i).zfill(2)
-
-            metrics += m
+                metrics.append((m[j][0] + '_' + str(i).zfill(2), m[j][1]))
 
             #backward pass
             self.optimizers[i].zero_grad()
@@ -76,7 +74,7 @@ class EnsembleModelRunner(BaseRunner):
 
         pred = torch.zeros_like(outputs[0])
         for i in range(len(outputs)):
-            pred += outputs / len(outputs)
+            pred += outputs[i] / len(outputs)
 
         return self.get_metrics(pred, batch[-1])
 
@@ -91,7 +89,7 @@ class EnsembleModelRunner(BaseRunner):
 
         metrics = [
             ('loss', loss.mean().item()),
-            ('acc', acc.mean().item()),
+            ('acc', acc),
             ('pred_01_rate', pred_01_rate),
             ('gt_01_rate', gt_01_rate),
             ('pred_min', pred_min), 
