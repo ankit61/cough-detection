@@ -2,17 +2,20 @@ from MultiStreamDNN import get_audio_model, get_visual_model_conv3D, get_visual_
 from MultiStreamDNN import MultiStreamDNN
 from BaseRunner import BaseRunner
 import torch
+import constants
+from MultiStreamDNN import get_audio_model, get_visual_model_conv2D, get_visual_model_conv3D
+import torch.nn as nn
 
 class EnsembleModelRunner(BaseRunner):
     def __init__(self, load_paths):
         nets = [
             MultiStreamDNN(
-                self.get_audio_model(), 
-                self.get_visual_model_conv3D()
+                get_audio_model(), 
+                get_visual_model_conv3D()
             ),
             MultiStreamDNN(
-                self.get_audio_model(), 
-                self.get_visual_model_conv2D()
+                get_audio_model(), 
+                get_visual_model_conv2D()
             )
         ]
 
@@ -22,10 +25,10 @@ class EnsembleModelRunner(BaseRunner):
 
         optimizers = [
             torch.optim.SGD(
-                net.parameters(), 
-                lr=ENSEMBLE_LRS[i], 
-                momentum=ENSEMBLE_MOMENTUMS[i], 
-                weight_decay=ENSEMBLE_WEIGHT_DECAYS[i]
+                nets[i].parameters(), 
+                lr=constants.ENSEMBLE_LRS[i], 
+                momentum=constants.ENSEMBLE_MOMENTUMS[i], 
+                weight_decay=constants.ENSEMBLE_WEIGHT_DECAYS[i]
             )
             for i in range(len(nets))
         ]
@@ -45,7 +48,7 @@ class EnsembleModelRunner(BaseRunner):
         for i in range(len(self.nets)):
             #forward pass
             pred = self.nets[i](batch[2 * i], batch[2 * i + 1]).squeeze(dim=1)
-            loss, m = self.get_metrics(pred_1, batch[4], get_original_loss=True)
+            loss, m = self.get_metrics(pred, batch[4], get_original_loss=True)
 
             for j in range(len(m)):
                 m[j][0] = m[j][0] + '_' + str(i).zfill(2)
