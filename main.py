@@ -1,7 +1,7 @@
 from CoughDataset import CoughDataset
 from ResNetRunner import ResNetRunner
 from ResNet3DRunner import ResNet3DRunner
-from MultiStreamDNNRunner import MultiStreamDNNRunner
+from EnsembleModelRunner import EnsembleModelRunner
 import argparse
 import constants
 from torch.utils.data import DataLoader
@@ -32,7 +32,7 @@ if not args.load_path:
 else:
     load_paths = [args.load_path]
 
-runner = MultiStreamDNNRunner(load_paths=load_paths)
+runner = EnsembleModelRunner(load_paths=load_paths)
 
 data_loader = DataLoader(
     dataset, 
