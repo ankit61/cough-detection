@@ -177,29 +177,11 @@ class BaseRunner(metaclass=ABCMeta):
 
             if val_loader is not None or validate_on_train:
                 if(sign(self.best_meter.avg - self.best_metric_val) == self.best_compare):
-                    for i in range(len(self.nets)):
-                        torch.save({
-                            'arch': self.nets[i].__class__.__name__ + self.model_code,
-                            'state_dict': self.nets[i].state_dict(),
-                            'best_metric_val': self.best_meter.avg,
-                            'best_metric_name': self.best_metric_name
-                            }, os.path.join(constants.MODELS_BASE_DIR,
-                                self.nets[i].__class__.__name__ + self.model_code + '_' + \
-                                'checkpoint_' + str(epoch + 1) + '.pth')
-                        )
-                        self.best_metric_val = self.best_meter.avg
+                    self.save_nets()
+                    self.best_metric_val = self.best_meter.avg
                 self.best_meter.reset()
             elif epoch % constants.SAVE_FREQ == 0:
-                for i in range(len(self.nets)):
-                    torch.save({
-                        'arch': self.nets[i].__class__.__name__ + self.model_code,
-                        'state_dict': self.nets[i].state_dict(),
-                        'best_metric_val': self.best_meter.avg,
-                        'best_metric_name': self.best_metric_name
-                        }, os.path.join(constants.MODELS_BASE_DIR,
-                            self.nets[i].__class__.__name__ + self.model_code + '_' + \
-                            'checkpoint_' + str(epoch + 1) + '.pth')
-                    )
+                self.save_nets()
 
         for i in range(len(self.lr_schedulers)):
             if(min(self.lr_schedulers[i].get_lr()) >=\
@@ -207,6 +189,19 @@ class BaseRunner(metaclass=ABCMeta):
                     self.lr_schedulers[i].step()
 
         self.output_weight_distribution("final_weights")
+
+    def save_nets(self):
+        for i in range(len(self.nets)):
+            name = self.nets[i].__class__.__name__ + str(i).zfill(2) + self.model_code
+            torch.save({
+                'arch':  name,
+                'state_dict': self.nets[i].state_dict(),
+                'best_metric_val': self.best_meter.avg,
+                'best_metric_name': self.best_metric_name
+                }, os.path.join(constants.MODELS_BASE_DIR,
+                    name + '_' + \
+                    'checkpoint_' + str(epoch + 1) + '.pth')
+            )
 
     def test(self, test_loader, validate=False):
         for i in range(len(self.nets)):
