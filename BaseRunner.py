@@ -177,7 +177,7 @@ class BaseRunner(metaclass=ABCMeta):
 
             if val_loader is not None or validate_on_train:
                 if(sign(self.best_meter.avg - self.best_metric_val) == self.best_compare):
-                    self.save_nets()
+                    self.save_nets(epoch)
                     self.best_metric_val = self.best_meter.avg
                 self.best_meter.reset()
             elif epoch % constants.SAVE_FREQ == 0:
