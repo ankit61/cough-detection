@@ -181,7 +181,7 @@ class BaseRunner(metaclass=ABCMeta):
                     self.best_metric_val = self.best_meter.avg
                 self.best_meter.reset()
             elif epoch % constants.SAVE_FREQ == 0:
-                self.save_nets()
+                self.save_nets(epoch)
 
         for i in range(len(self.lr_schedulers)):
             if(min(self.lr_schedulers[i].get_lr()) >=\
@@ -190,7 +190,7 @@ class BaseRunner(metaclass=ABCMeta):
 
         self.output_weight_distribution("final_weights")
 
-    def save_nets(self):
+    def save_nets(self, epoch):
         for i in range(len(self.nets)):
             name = self.nets[i].__class__.__name__ + str(i).zfill(2) + self.model_code
             torch.save({
