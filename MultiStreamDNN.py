@@ -12,19 +12,26 @@ def get_audio_model():
 
     return net
 
-def get_visual_model():
+def get_visual_model_conv3D():
     return resnet10(
             num_classes=constants.NUM_CLASSES, 
             sample_duration=constants.VIDEO_FPS, 
             sample_size=constants.INPUT_FRAME_WIDTH
         )
 
+def get_visual_model_conv2D():
+    net = resnet18(pretrained=True)
+    net.conv1 = nn.Conv2d(constants.VIDEO_FPS * constants.CHUNK_SIZE * 3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    net.bn1 = nn.BatchNorm2d(64)
+
+    return net
+
 class MultiStreamDNN(nn.Module):
-    def __init__(self):
+    def __init__(self, visual_model, audio_model):
         super(MultiStreamDNN, self).__init__()
-        self.visual_model = get_visual_model()
-        self.audio_model = get_audio_model()
-        
+        self.visual_model = visual_model
+        self.audio_model = audio_model
+
         video_features_len = self.audio_model.fc.in_features + self.visual_model.fc.in_features
 
         self.visual_model.fc = nn.Sequential()
