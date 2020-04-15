@@ -11,7 +11,7 @@ from VATransforms import VideoTransform, ReduceAudioChannels, NormalizeAudio
 class CoughDataset(Dataset):
     def __init__(self, root_dir = constants.DATA_BASE_DIR, result_mode = False, chunk_size = constants.CHUNK_SIZE, model_type='all'):
 
-        assert models in ['all', 'conv3D_MFCCs', 'conv2D_MF']
+        assert model_type in ['all', 'conv3D_MFCCs', 'conv2D_MF']
         assert chunk_size == 1, 'current implementation only supports 1 second chunks'
 
         fs = [f for f in os.listdir(root_dir) if f.endswith(constants.VISUAL_SUFFIX)]

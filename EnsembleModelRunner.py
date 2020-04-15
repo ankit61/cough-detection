@@ -9,7 +9,7 @@ import torch.nn as nn
 class EnsembleModelRunner(BaseRunner):
     def __init__(self, load_paths, model_type='all'):
         
-        assert models in ['all', 'conv3D_MFCCs', 'conv2D_MF']
+        assert model_type in ['all', 'conv3D_MFCCs', 'conv2D_MF']
 
         if models == 'all':
             nets = [
