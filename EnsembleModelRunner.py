@@ -11,7 +11,7 @@ class EnsembleModelRunner(BaseRunner):
         
         assert model_type in ['all', 'conv3D_MFCCs', 'conv2D_MF']
 
-        if models == 'all':
+        if model_type == 'all':
             nets = [
                 MultiStreamDNN(            
                     get_visual_model_conv3D(),
@@ -22,14 +22,14 @@ class EnsembleModelRunner(BaseRunner):
                     get_audio_model()
                 )
             ]
-        elif models == 'conv3D_MFCCs':
+        elif model_type == 'conv3D_MFCCs':
             nets = [
                 MultiStreamDNN(            
                     get_visual_model_conv3D(),
                     get_audio_model()
                 )
             ]
-        elif models == 'conv2D_MF':
+        elif model_type == 'conv2D_MF':
             nets = [
                 MultiStreamDNN(
                     get_visual_model_conv2D(),
