@@ -43,7 +43,8 @@ class BaseRunner(metaclass=ABCMeta):
         
         if load_paths is not None:
             for i in range(len(load_paths)):
-                self.load_model(models[i], load_paths[i])
+                if load_paths[i]:
+                    self.load_model(models[i], load_paths[i])
 
         if(torch.cuda.is_available()):
             for i in range(len(self.nets)):
