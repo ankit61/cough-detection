@@ -43,7 +43,7 @@ class MultiStreamDNN(nn.Module):
             nn.Linear(video_features_len, 512),
             nn.ReLU(),
             nn.Dropout(constants.DROPOUT_PROB),
-            nn.Linear(video_features_len, 256),
+            nn.Linear(512, 256),
             nn.ReLU(),
             nn.Dropout(constants.DROPOUT_PROB),
             nn.Linear(256, 1)
