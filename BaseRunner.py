@@ -158,9 +158,9 @@ class BaseRunner(metaclass=ABCMeta):
             start_time = time.time()
 
             if i % constants.PRINT_FREQ == 0:
-                progress.display(i, epoch)
+                progress.display(i + 1, epoch)
 
-        progress.display(i, epoch)
+        progress.display(i + 1, epoch)
 
     def train(self, train_loader, epochs, val_loader = None, validate_on_train=False):
         assert val_loader is None or not validate_on_train 
