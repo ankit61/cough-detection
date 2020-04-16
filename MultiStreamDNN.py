@@ -40,6 +40,9 @@ class MultiStreamDNN(nn.Module):
         video_features_len = constants.HOLISTIC_FEATURES_LEN
 
         self.mlp = nn.Sequential(
+            nn.Linear(video_features_len, 512),
+            nn.ReLU(),
+            nn.Dropout(constants.DROPOUT_PROB),
             nn.Linear(video_features_len, 256),
             nn.ReLU(),
             nn.Dropout(constants.DROPOUT_PROB),
