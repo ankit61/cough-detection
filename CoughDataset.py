@@ -25,13 +25,13 @@ class CoughDataset(Dataset):
                 ReduceAudioChannels(),
                 NormalizeAudio(),
                 AT.Resample(constants.AUDIO_SAMPLE_RATE, constants.RESAMPLED_AUDIO_SAMPLE_RATE),
-                AT.MFCC(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE)
+                AT.MFCC(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE, n_mfcc=constants.N_MFCCS)
             ]),
             IT.Compose([
                 ReduceAudioChannels(),
                 NormalizeAudio(),
                 AT.Resample(constants.AUDIO_SAMPLE_RATE, constants.RESAMPLED_AUDIO_SAMPLE_RATE),
-                AT.MelSpectrogram(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE)
+                AT.MelSpectrogram(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE, n_mels=constants.N_MELS)
             ])
 
         ]

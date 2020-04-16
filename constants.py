@@ -19,11 +19,13 @@ MOMENTUM                    = 0.9
 DROPOUT_PROB                = 0.5
 FRAME_3D_CONVS              = 10
 HOLISTIC_FEATURES_LEN       = 1024
+N_MFCCS                     = 100
+N_MELS                      = 300
 
 #ENSEMBLE HYPERPARAMS
 ENSEMBLE_LRS                = [LR, 0.0001]
 ENSEMBLE_MOMENTUMS          = [MOMENTUM, MOMENTUM]
-ENSEMBLE_WEIGHT_DECAYS      = [WEIGHT_DECAY, WEIGHT_DECAY]
+ENSEMBLE_WEIGHT_DECAYS      = [WEIGHT_DECAY, 12e-4]
 
 #DATASET
 CHUNK_SIZE                  = 1
