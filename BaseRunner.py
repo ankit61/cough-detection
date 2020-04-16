@@ -176,6 +176,7 @@ class BaseRunner(metaclass=ABCMeta):
             self.run(train_loader, 'train', epoch, train_metrics_calc)
             
             if val_loader is not None:
+                self.best_meter.reset()
                 self.test(val_loader, validate=True)
 
             if val_loader is not None or validate_on_train:
@@ -221,7 +222,7 @@ class BaseRunner(metaclass=ABCMeta):
 
     def train_batch_and_track_metrics(self, batch):
         return self.get_metrics_and_track_best(batch, self.train_batch_and_get_metrics)
-    
+
     def get_metrics_and_track_best(self, batch, metrics_calc):
         metrics = metrics_calc(batch)
         did_find_name = False
