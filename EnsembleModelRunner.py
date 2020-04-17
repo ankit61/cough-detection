@@ -22,11 +22,42 @@ class EnsembleModelRunner(BaseRunner):
                     get_audio_model()
                 )
             ]
+
+            if torch.cuda.is_available():
+                for i in range(len(nets)):
+                    nets[i] = nets[i].cuda()
+
+            optimizers = [
+                torch.optim.SGD(
+                    nets[0].parameters(), 
+                    lr=constants.SGD_LR,
+                    momentum=constants.SGD_MOMENTUM
+                    weight_decay=constants.SGD_WEIGHT_DECAY
+                ),
+                torch.optim.Adam(
+                    nets[1].parameters(), 
+                    lr=constants.ADAM_LR,
+                    weight_decay=constants.ADAM_WEIGHT_DECAY
+                )
+            ]
         elif model_type == 'conv3D_MFCCs':
             nets = [
                 MultiStreamDNN(            
                     get_visual_model_conv3D(),
                     get_audio_model()
+                )
+            ]
+
+            if torch.cuda.is_available():
+                for i in range(len(nets)):
+                    nets[i] = nets[i].cuda()
+
+            optimizers = [
+                torch.optim.SGD(
+                    nets[0].parameters(), 
+                    lr=constants.SGD_LR,
+                    momentum=constants.SGD_MOMENTUM
+                    weight_decay=constants.SGD_WEIGHT_DECAY
                 )
             ]
         elif model_type == 'conv2D_MF':
@@ -37,18 +68,17 @@ class EnsembleModelRunner(BaseRunner):
                 )
             ]
 
-        if torch.cuda.is_available():
-            for i in range(len(nets)):
-                nets[i] = nets[i].cuda()
+            if torch.cuda.is_available():
+                for i in range(len(nets)):
+                    nets[i] = nets[i].cuda()
 
-        optimizers = [
-            torch.optim.Adam(
-                nets[i].parameters(), 
-                lr=constants.ENSEMBLE_LRS[i], 
-                weight_decay=constants.ENSEMBLE_WEIGHT_DECAYS[i]
-            )
-            for i in range(len(nets))
-        ]
+            optimizers = [
+                torch.optim.Adam(
+                    nets[0].parameters(), 
+                    lr=constants.ADAM_LR, 
+                    weight_decay=constants.ADAM_WEIGHT_DECAY
+                )
+            ]
 
         super(EnsembleModelRunner, self).__init__(
             nets, 
