@@ -112,6 +112,19 @@ class EnsembleModelRunner(BaseRunner):
 
         return metrics
 
+    def do_forward_pass(self, batch):
+        outputs = []
+        for i in range(len(self.nets)):
+            outputs.append(
+                self.nets[i](batch[2 * i], batch[2 * i + 1]).squeeze(dim=1)
+            )
+
+        pred = torch.zeros_like(outputs[0])
+        for i in range(len(outputs)):
+            pred += outputs[i] / len(outputs)
+        
+        return pred
+    
     def test_batch_and_get_metrics(self, batch):
         outputs = []
         for i in range(len(self.nets)):
