@@ -31,7 +31,7 @@ class EnsembleModelRunner(BaseRunner):
                 torch.optim.SGD(
                     nets[0].parameters(), 
                     lr=constants.SGD_LR,
-                    momentum=constants.SGD_MOMENTUM
+                    momentum=constants.SGD_MOMENTUM,
                     weight_decay=constants.SGD_WEIGHT_DECAY
                 ),
                 torch.optim.Adam(
@@ -56,7 +56,7 @@ class EnsembleModelRunner(BaseRunner):
                 torch.optim.SGD(
                     nets[0].parameters(), 
                     lr=constants.SGD_LR,
-                    momentum=constants.SGD_MOMENTUM
+                    momentum=constants.SGD_MOMENTUM,
                     weight_decay=constants.SGD_WEIGHT_DECAY
                 )
             ]
