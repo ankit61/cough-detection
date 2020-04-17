@@ -68,4 +68,4 @@ Sample videos playlist:
  - Submission 2: https://www.youtube.com/playlist?list=PLzTd-IE8CXpWKQMGInhXw3QRCfXQwJsNl
  - Submission 3: https://www.youtube.com/playlist?list=PLzTd-IE8CXpW4FmoskUIUOcJOIKDRlZy6
 
-Video explaining how to run: 
+Video explaining how to run: https://youtu.be/lbWrVA05pJo
