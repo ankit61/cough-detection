@@ -58,10 +58,14 @@ Note again that ```YOUR_DATA_DIR``` must have videos named in the same format as
 This ```labels.json``` indicates that there was coughing in ```file1_v.mp4``` between 1 - 2, 2 - 3, 3 - 4 seconds. Similarly, there was coughing in ```file2_v.mp4``` between 1 - 2 seconds and there was no coughing in ```file3_v.mp4```.
 
 
+## Trained Models
+Accessible at https://drive.google.com/open?id=1s_K1Ju2haDDMzyxUejwhasOY6BnKuL08
+
 ## YouTube Videos
 
 Sample videos playlist: 
  - Submission 1: https://www.youtube.com/playlist?list=PLzTd-IE8CXpX3N-rEbUMjfIlHXNDH-90S
  - Submission 2: https://www.youtube.com/playlist?list=PLzTd-IE8CXpWKQMGInhXw3QRCfXQwJsNl
+ - Submission 3: https://www.youtube.com/playlist?list=PLzTd-IE8CXpW4FmoskUIUOcJOIKDRlZy6
 
-Video explaining how to run: https://youtu.be/dyYCqbJRGog
+Video explaining how to run: 
