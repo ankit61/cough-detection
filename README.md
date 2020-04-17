@@ -22,7 +22,7 @@ sudo apt-get install
 sudo apt-get install libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev libavutil-dev libswscale-dev libswresample-dev
 pip3 install -r requirements.txt
 sudo add-apt-repository --remove ppa:savoury1/ffmpeg4
-sudo add-apt-repository ==remove ppa:savoury1/graphics
+sudo add-apt-repository --remove ppa:savoury1/graphics
 sudo add-apt-repository --remove ppa:savoury1/multimedia
 ```
 
