@@ -2,8 +2,7 @@ from MultiStreamDNN import MultiStreamDNN
 from BaseResNetRunner import BaseResNetRunner
 
 class MultiStreamDNNRunner(BaseResNetRunner):
-    def __init__(self, load_paths=None):
-        net = MultiStreamDNN()
+    def __init__(self, net = MultistreamDNN(), load_paths=None):
         super(MultiStreamDNNRunner, self).__init__(net, load_paths=load_paths)
 
     def do_forward_pass(self, batch):

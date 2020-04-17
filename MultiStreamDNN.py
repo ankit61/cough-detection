@@ -1,22 +1,49 @@
-from ResNet3DRunner import get_visual_model
-from ResNetRunner import get_audio_model
+from torchvision.models import resnet18
+from ResNet3D import resnet10
 import torch.nn as nn
 import torch
 import constants
 
-class MultiStreamDNN(nn.Module):
-    def __init__(self):
-        super(MultiStreamDNN, self).__init__()
-        self.visual_model = get_visual_model()
-        self.audio_model = get_audio_model()
-        
-        video_features_len = self.audio_model.fc.in_features + self.visual_model.fc.in_features
+def get_audio_model():
+    net = resnet18()
+    net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    net.bn1 = nn.BatchNorm2d(64)
+    net.fc = nn.Sequential()
 
-        self.visual_model.fc = nn.Sequential()
-        self.audio_model.fc = nn.Sequential()
+    return net
+
+def get_visual_model_conv3D():
+    net = resnet10(
+            num_classes=constants.NUM_CLASSES, 
+            sample_duration=constants.VIDEO_FPS, 
+            sample_size=constants.INPUT_FRAME_WIDTH
+        )
+
+    net.fc = nn.Sequential()
+
+    return net
+
+def get_visual_model_conv2D():
+    net = resnet18()
+    net.conv1 = nn.Conv2d(constants.VIDEO_FPS * constants.CHUNK_SIZE * 3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+    net.bn1 = nn.BatchNorm2d(64)
+    net.fc = nn.Sequential()
+
+    return net
+
+class MultiStreamDNN(nn.Module):
+    def __init__(self, visual_model, audio_model):
+        super(MultiStreamDNN, self).__init__()
+        self.visual_model = visual_model
+        self.audio_model = audio_model
+
+        video_features_len = constants.HOLISTIC_FEATURES_LEN
 
         self.mlp = nn.Sequential(
-            nn.Linear(video_features_len, 256),
+            nn.Linear(video_features_len, 512),
+            nn.ReLU(),
+            nn.Dropout(constants.DROPOUT_PROB),
+            nn.Linear(512, 256),
             nn.ReLU(),
             nn.Dropout(constants.DROPOUT_PROB),
             nn.Linear(256, 1)

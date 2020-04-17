@@ -43,7 +43,8 @@ class BaseRunner(metaclass=ABCMeta):
         
         if load_paths is not None:
             for i in range(len(load_paths)):
-                self.load_model(models[i], load_paths[i])
+                if load_paths[i]:
+                    self.load_model(models[i], load_paths[i])
 
         if(torch.cuda.is_available()):
             for i in range(len(self.nets)):
@@ -158,7 +159,10 @@ class BaseRunner(metaclass=ABCMeta):
             start_time = time.time()
 
             if i % constants.PRINT_FREQ == 0:
-                progress.display(i, epoch)
+                progress.display(i + 1, epoch)
+
+        if i % constants.PRINT_FREQ != 0:
+            progress.display(i + 1, epoch)
 
     def train(self, train_loader, epochs, val_loader = None, validate_on_train=False):
         assert val_loader is None or not validate_on_train 
@@ -173,33 +177,16 @@ class BaseRunner(metaclass=ABCMeta):
             self.run(train_loader, 'train', epoch, train_metrics_calc)
             
             if val_loader is not None:
+                self.best_meter.reset()
                 self.test(val_loader, validate=True)
 
             if val_loader is not None or validate_on_train:
                 if(sign(self.best_meter.avg - self.best_metric_val) == self.best_compare):
-                    for i in range(len(self.nets)):
-                        torch.save({
-                            'arch': self.nets[i].__class__.__name__ + self.model_code,
-                            'state_dict': self.nets[i].state_dict(),
-                            'best_metric_val': self.best_meter.avg,
-                            'best_metric_name': self.best_metric_name
-                            }, os.path.join(constants.MODELS_BASE_DIR,
-                                self.nets[i].__class__.__name__ + self.model_code + '_' + \
-                                'checkpoint_' + str(epoch + 1) + '.pth')
-                        )
-                        self.best_metric_val = self.best_meter.avg
+                    self.save_nets(epoch)
+                    self.best_metric_val = self.best_meter.avg
                 self.best_meter.reset()
             elif epoch % constants.SAVE_FREQ == 0:
-                for i in range(len(self.nets)):
-                    torch.save({
-                        'arch': self.nets[i].__class__.__name__ + self.model_code,
-                        'state_dict': self.nets[i].state_dict(),
-                        'best_metric_val': self.best_meter.avg,
-                        'best_metric_name': self.best_metric_name
-                        }, os.path.join(constants.MODELS_BASE_DIR,
-                            self.nets[i].__class__.__name__ + self.model_code + '_' + \
-                            'checkpoint_' + str(epoch + 1) + '.pth')
-                    )
+                self.save_nets(epoch)
 
         for i in range(len(self.lr_schedulers)):
             if(min(self.lr_schedulers[i].get_lr()) >=\
@@ -207,6 +194,19 @@ class BaseRunner(metaclass=ABCMeta):
                     self.lr_schedulers[i].step()
 
         self.output_weight_distribution("final_weights")
+
+    def save_nets(self, epoch):
+        for i in range(len(self.nets)):
+            name = self.nets[i].__class__.__name__ + str(i).zfill(2) + self.model_code
+            torch.save({
+                'arch':  name,
+                'state_dict': self.nets[i].state_dict(),
+                'best_metric_val': self.best_meter.avg,
+                'best_metric_name': self.best_metric_name
+                }, os.path.join(constants.MODELS_BASE_DIR,
+                    name + '_' + \
+                    'checkpoint_' + str(epoch + 1) + '.pth')
+            )
 
     def test(self, test_loader, validate=False):
         for i in range(len(self.nets)):
@@ -223,7 +223,7 @@ class BaseRunner(metaclass=ABCMeta):
 
     def train_batch_and_track_metrics(self, batch):
         return self.get_metrics_and_track_best(batch, self.train_batch_and_get_metrics)
-    
+
     def get_metrics_and_track_best(self, batch, metrics_calc):
         metrics = metrics_calc(batch)
         did_find_name = False

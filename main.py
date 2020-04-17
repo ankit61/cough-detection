@@ -1,7 +1,7 @@
 from CoughDataset import CoughDataset
 from ResNetRunner import ResNetRunner
 from ResNet3DRunner import ResNet3DRunner
-from MultiStreamDNNRunner import MultiStreamDNNRunner
+from EnsembleModelRunner import EnsembleModelRunner
 import argparse
 import constants
 from torch.utils.data import DataLoader
@@ -15,7 +15,9 @@ import os
 parser = argparse.ArgumentParser('arg parser')
 
 parser.add_argument('--mode', '-m', default='train', choices=['train', 'test', 'gen_result'])
-parser.add_argument('--load-path', '-lp', default='')
+parser.add_argument('--model-type', default='all', choices=['all', 'conv3D_MFCCs', 'conv2D_MF'])
+parser.add_argument('--conv2d-load-path', default='')
+parser.add_argument('--conv3d-load-path', default='')
 parser.add_argument('--data-dir', '-d', default=constants.DATA_BASE_DIR)
 if os.path.exists(os.path.join(constants.DATA_BASE_DIR, 'test')):
     parser.add_argument('--test-dir', '-t', default=os.path.join(constants.DATA_BASE_DIR, 'test'))
@@ -24,15 +26,15 @@ else:
 
 args =  parser.parse_args()
 
-dataset = CoughDataset(root_dir=args.data_dir, result_mode=(args.mode == 'gen_result'))
-test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'gen_result'))
+dataset = CoughDataset(root_dir=args.data_dir, result_mode=(args.mode == 'gen_result'), model_type=args.model_type)
+test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'gen_result'), model_type=args.model_type)
 
-if not args.load_path:
-    load_paths = None
-else:
-    load_paths = [args.load_path]
-
-runner = MultiStreamDNNRunner(load_paths=load_paths)
+if args.model_type == 'all':
+    runner = EnsembleModelRunner(load_paths=[args.conv3d_load_path, args.conv2d_load_path], model_type = args.model_type)
+elif args.model_type == 'conv3D_MFCCs':
+    runner = EnsembleModelRunner(load_paths=[args.conv3d_load_path], model_type = args.model_type)
+elif args.model_type == 'conv2D_MF':
+    runner = EnsembleModelRunner(load_paths=[args.conv2d_load_path], model_type = args.model_type)
 
 data_loader = DataLoader(
     dataset, 
@@ -58,10 +60,10 @@ else:
     label_graph_output = {}
 
     for i in range(len(dataset)):
-        inp = [dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0)]
+        inp = [dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0), dataset[i][2].unsqueeze(dim=0), dataset[i][3].unsqueeze(dim=0)]
         if torch.cuda.is_available():
-            inp[0] = inp[0].cuda()
-            inp[1] = inp[1].cuda()
+            for j in range(len(inp)):
+                inp[j] = inp[j].cuda()
         prob = runner.do_forward_pass(inp).sigmoid().item()
         original_file, interval = dataset.get_meta(i)
         
