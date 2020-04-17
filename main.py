@@ -62,8 +62,8 @@ else:
     for i in range(len(dataset)):
         inp = [dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0), dataset[i][2].unsqueeze(dim=0), dataset[i][3].unsqueeze(dim=0)]
         if torch.cuda.is_available():
-            for i in range(len(inp)):
-                inp[i] = inp[i].cuda()
+            for j in range(len(inp)):
+                inp[j] = inp[j].cuda()
         prob = runner.do_forward_pass(inp).sigmoid().item()
         original_file, interval = dataset.get_meta(i)
         
