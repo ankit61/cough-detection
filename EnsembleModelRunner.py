@@ -3,17 +3,17 @@ from MultiStreamDNN import MultiStreamDNN
 from BaseRunner import BaseRunner
 import torch
 import constants
-from MultiStreamDNN import get_audio_model, get_visual_model_conv2D, get_visual_model_conv3D
 import torch.nn as nn
+
 
 class EnsembleModelRunner(BaseRunner):
     def __init__(self, load_paths, model_type='all'):
-        
+
         assert model_type in ['all', 'conv3D_MFCCs', 'conv2D_MF']
 
         if model_type == 'all':
             nets = [
-                MultiStreamDNN(            
+                MultiStreamDNN(
                     get_visual_model_conv3D(),
                     get_audio_model()
                 ),
@@ -29,20 +29,20 @@ class EnsembleModelRunner(BaseRunner):
 
             optimizers = [
                 torch.optim.SGD(
-                    nets[0].parameters(), 
+                    nets[0].parameters(),
                     lr=constants.SGD_LR,
                     momentum=constants.SGD_MOMENTUM,
                     weight_decay=constants.SGD_WEIGHT_DECAY
                 ),
                 torch.optim.Adam(
-                    nets[1].parameters(), 
+                    nets[1].parameters(),
                     lr=constants.ADAM_LR,
                     weight_decay=constants.ADAM_WEIGHT_DECAY
                 )
             ]
         elif model_type == 'conv3D_MFCCs':
             nets = [
-                MultiStreamDNN(            
+                MultiStreamDNN(
                     get_visual_model_conv3D(),
                     get_audio_model()
                 )
@@ -54,7 +54,7 @@ class EnsembleModelRunner(BaseRunner):
 
             optimizers = [
                 torch.optim.SGD(
-                    nets[0].parameters(), 
+                    nets[0].parameters(),
                     lr=constants.SGD_LR,
                     momentum=constants.SGD_MOMENTUM,
                     weight_decay=constants.SGD_WEIGHT_DECAY
@@ -81,8 +81,8 @@ class EnsembleModelRunner(BaseRunner):
             ]
 
         super(EnsembleModelRunner, self).__init__(
-            nets, 
-            loss_fn = nn.BCEWithLogitsLoss(),
+            nets,
+            loss_fn=nn.BCEWithLogitsLoss(),
             optimizers=optimizers,
             best_metric_name='acc',
             should_minimize_best_metric=False,
@@ -93,18 +93,18 @@ class EnsembleModelRunner(BaseRunner):
         metrics = []
 
         for i in range(len(self.nets)):
-            #forward pass
+            # forward pass
             pred = self.nets[i](batch[2 * i], batch[2 * i + 1]).squeeze(dim=1)
             loss, m = self.get_metrics(pred, batch[-1], get_original_loss=True)
 
             for j in range(len(m)):
                 metrics.append((m[j][0] + '_' + str(i).zfill(2), m[j][1]))
 
-            #backward pass
+            # backward pass
             self.optimizers[i].zero_grad()
             loss.backward()
 
-            #step
+            # step
             self.optimizers[i].step()
 
         self.output_gradient_distributions(self.global_step)
@@ -122,23 +122,15 @@ class EnsembleModelRunner(BaseRunner):
         pred = torch.zeros_like(outputs[0])
         for i in range(len(outputs)):
             pred += outputs[i] / len(outputs)
-        
-        return pred
-    
-    def test_batch_and_get_metrics(self, batch):
-        outputs = []
-        for i in range(len(self.nets)):
-            outputs.append(
-                self.nets[i](batch[2 * i], batch[2 * i + 1]).squeeze(dim=1)
-            )
 
-        pred = torch.zeros_like(outputs[0])
-        for i in range(len(outputs)):
-            pred += outputs[i] / len(outputs)
+        return pred
+
+    def test_batch_and_get_metrics(self, batch):
+        pred = self.do_forward_pass(self, batch)
 
         return self.get_metrics(pred, batch[-1])
 
-    def get_metrics(self, pred, gt, get_original_loss = False):
+    def get_metrics(self, pred, gt, get_original_loss=False):
         loss            = self.loss_fn(pred, gt.float())
         acc             = self.get_accuracy(pred, gt)
         pred_min        = pred.min().item()
@@ -152,8 +144,8 @@ class EnsembleModelRunner(BaseRunner):
             ('acc', acc),
             ('pred_01_rate', pred_01_rate),
             ('gt_01_rate', gt_01_rate),
-            ('pred_min', pred_min), 
-            ('pred_max', pred_max), 
+            ('pred_min', pred_min),
+            ('pred_max', pred_max),
             ('pred_std', pred_std)
         ]
 
