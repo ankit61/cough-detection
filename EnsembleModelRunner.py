@@ -126,7 +126,7 @@ class EnsembleModelRunner(BaseRunner):
         return pred
 
     def test_batch_and_get_metrics(self, batch):
-        pred = self.do_forward_pass(self, batch)
+        pred = self.do_forward_pass(batch)
 
         return self.get_metrics(pred, batch[-1])
 
