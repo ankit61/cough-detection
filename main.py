@@ -39,7 +39,7 @@ elif args.model_type == 'conv2D_MF':
 data_loader = DataLoader(
     dataset, 
     batch_size=constants.BATCH_SIZE, 
-    shuffle=True
+    shuffle=(args.mode == 'train')
 )
 
 test_loader = DataLoader(
