@@ -37,10 +37,10 @@ class BaseRunner(metaclass=ABCMeta):
         self.model_code = model_code
         self.keys_for_gpu = None
         self.lr_schedulers = \
-            [lr_scheduler.StepLR(optimizers[i], LR_DECAY_STEP_SIZE, LR_DECAY_FACTOR) 
+            [lr_scheduler.StepLR(optimizers[i], LR_DECAY_STEP_SIZE, LR_DECAY_FACTOR)
                 for i in range(len(self.optimizers))]
         self.global_step = 0
-        
+
         if load_paths is not None:
             for i in range(len(load_paths)):
                 if load_paths[i]:
@@ -51,7 +51,7 @@ class BaseRunner(metaclass=ABCMeta):
                 self.nets[i] = self.nets[i].cuda()
 
             loss_fn = loss_fn.cuda()
-  
+
     def load_model(self, model, path):
         d = torch.load(path)
         try:
@@ -73,7 +73,7 @@ class BaseRunner(metaclass=ABCMeta):
                 if param_val.grad is not None:
                     param_distribution_tag = f'{net.__class__.__name__}/{name_prefix}/{param_name}'
                     self.writer.add_histogram(param_distribution_tag, param_val)
-    
+
     def output_gradient_distributions(self, global_step, name_prefix="training_gradients"):
         if not self.introspect:
             return
@@ -83,7 +83,7 @@ class BaseRunner(metaclass=ABCMeta):
                 if param.grad is not None:
                     param_distribution_tag = f'{net.__class__.__name__}/{name_prefix}/{param_name}'
                     self.writer.add_histogram(param_distribution_tag, param.grad, global_step=global_step)
-    
+
     def output_gradient_norms(self, global_step, name_prefix="training_gradient_norms"):
         if not self.introspect:
             return
@@ -110,25 +110,25 @@ class BaseRunner(metaclass=ABCMeta):
         batch_time_meter = utils.AverageMeter('Time')
         data_time_meter  = utils.AverageMeter('Data')
         other_meters = []
-        
+
         progress_display_made = False
         start_time = time.time()
 
         for i, batch in enumerate(data_loader):
             batch_number = epoch * len(data_loader) + i + 1
-            data_time_meter.update(time.time() - start_time)
+            data_time_meter.update(time.time() - start_time, n=self.get_batch_size(batch))
 
-            #if batch_number % constants.INTERMITTENT_OUTPUT_FREQ == 0:
+            # if batch_number % constants.INTERMITTENT_OUTPUT_FREQ == 0:
             #    self.intermittent_introspection(batch, batch_number)
 
-            #transfer from CPU -> GPU asynchronously if at all
+            # transfer from CPU -> GPU asynchronously if at all
             if torch.cuda.is_available():
                 if type(batch) != type([]) and type(batch) != type({}):
                     batch = batch.cuda(non_blocking=True)
                 elif type(batch) == type([]):
                     for j in range(len(batch)):
                         batch[j] = batch[j].cuda(non_blocking=True)
-                else: #type(batch) == type({})
+                else:  # type(batch) == type({})
                     for key in batch.keys():
                         if self.keys_for_gpu is None or key in self.keys_for_gpu:
                             batch[key] = batch[key].cuda(non_blocking=True)
@@ -137,17 +137,17 @@ class BaseRunner(metaclass=ABCMeta):
             # loss.backward is called in metrics_calc
             if metrics is not None:
                 for j, (metric_name, metric_val) in enumerate(metrics):
-                    self.writer.add_scalar(os.path.join(self.name, prefix + '_' + 
+                    self.writer.add_scalar(os.path.join(self.name, prefix + '_' +
                         metric_name), metric_val, self.global_step)
 
                     if not progress_display_made:
                         other_meters.append(utils.AverageMeter(metric_name))
-                        other_meters[j].update(metric_val)
+                        other_meters[j].update(metric_val, n=self.get_batch_size(batch))
                     else:
-                        other_meters[j].update(metric_val)
+                        other_meters[j].update(metric_val, n=self.get_batch_size(batch))
 
                 self.global_step += 1
-                
+
                 if not progress_display_made:
                     progress = utils.ProgressMeter(len(data_loader), other_meters + \
                         [batch_time_meter, data_time_meter], prefix=prefix)
@@ -155,7 +155,7 @@ class BaseRunner(metaclass=ABCMeta):
             elif not progress_display_made:
                 progress = utils.ProgressMeter(len(data_loader), [batch_time_meter, data_time_meter], prefix=prefix)
 
-            batch_time_meter.update(time.time() - start_time)
+            batch_time_meter.update(time.time() - start_time, n=self.get_batch_size(batch))
             start_time = time.time()
 
             if i % constants.PRINT_FREQ == 0:
@@ -164,8 +164,8 @@ class BaseRunner(metaclass=ABCMeta):
         if i % constants.PRINT_FREQ != 0:
             progress.display(i + 1, epoch)
 
-    def train(self, train_loader, epochs, val_loader = None, validate_on_train=False):
-        assert val_loader is None or not validate_on_train 
+    def train(self, train_loader, epochs, val_loader=None, validate_on_train=False):
+        assert val_loader is None or not validate_on_train
         self.output_weight_distribution("weight_initializations")
 
         for i in range(len(self.nets)):
@@ -175,7 +175,7 @@ class BaseRunner(metaclass=ABCMeta):
 
         for epoch in range(epochs):
             self.run(train_loader, 'train', epoch, train_metrics_calc)
-            
+
             if val_loader is not None:
                 self.best_meter.reset()
                 self.test(val_loader, validate=True)
@@ -229,7 +229,7 @@ class BaseRunner(metaclass=ABCMeta):
         did_find_name = False
         for (metric_name, metric_val) in metrics:
             if metric_name == self.best_metric_name:
-                self.best_meter.update(metric_val)
+                self.best_meter.update(metric_val, n=self.get_batch_size(batch))
                 did_find_name = True
                 break
 
@@ -248,7 +248,7 @@ class BaseRunner(metaclass=ABCMeta):
             update by doing optimizer.step() (remember to do 
             optimizer.zero_grad()).  Finally, use a learning rate scheduler
             (default choice can be torch.optim.lr_scheduler.StepLR)
-           
+
             Return: metrics - [(metric_name, metric_val (should be scalar))]
         '''
         return
@@ -256,6 +256,10 @@ class BaseRunner(metaclass=ABCMeta):
     @abstractmethod
     def test_batch_and_get_metrics(self, batch):
         '''Perform forward pass here.
-           
+
             Return: metrics - [(metric_name, metric_val (should be scalar))]'''
+        return
+
+    @abstractmethod
+    def get_batch_size(self, batch):
         return
