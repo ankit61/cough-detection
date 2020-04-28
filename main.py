@@ -44,8 +44,8 @@ data_loader = DataLoader(
 
 test_loader = DataLoader(
     test_dataset, 
-    batch_size=constants.BATCH_SIZE, 
-    shuffle=True
+    batch_size=constants.BATCH_SIZE,
+    shuffle=False
 )
 
 if args.mode == 'train':
