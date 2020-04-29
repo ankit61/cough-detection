@@ -1,4 +1,4 @@
-from torchvision.models import resnet18
+from torchvision.models import resnet18, resnet34
 from ResNet3D import resnet18 as resnet183D
 import torch.nn as nn
 import torch

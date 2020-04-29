@@ -79,7 +79,7 @@ class CoughDataset(Dataset):
             self.ensemble_audio_transforms = [self.ensemble_audio_transforms[1]]
             self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[1]]
             self.ensemble_audio_post_transforms = [self.ensemble_audio_post_transforms[1]]
-        elif model_type == 'audioMF':
+        elif model_type == 'audio_MF':
             self.ensemble_video_transforms = [self.ensemble_video_transforms[2]]
             self.ensemble_audio_transforms = [self.ensemble_audio_transforms[2]]
             self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[2]]
