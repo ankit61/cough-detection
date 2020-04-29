@@ -10,10 +10,9 @@ from torchvision.models import resnet34
 class AudioMF(nn.Module):
     def __init__(self):
         super(AudioMF, self).__init__()
-        self.net = resnet34()
+        self.net = resnet34(num_classes=1)
         self.net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.net.bn1 = nn.BatchNorm2d(64)
-        self.net.fc = nn.Sequential()
 
     def forward(self, v, a):
         return self.net(a)
