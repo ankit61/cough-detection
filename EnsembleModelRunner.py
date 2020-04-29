@@ -4,81 +4,68 @@ from BaseRunner import BaseRunner
 import torch
 import constants
 import torch.nn as nn
+from torchvision.models import resnet34
+
+
+class AudioMF(nn.Module):
+    def __init__(self):
+        super(AudioMF, self).__init__()
+        self.net = resnet34()
+        self.net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.net.bn1 = nn.BatchNorm2d(64)
+        self.net.fc = nn.Sequential()
+
+    def forward(self, v, a):
+        return self.net(a)
 
 
 class EnsembleModelRunner(BaseRunner):
     def __init__(self, load_paths, model_type='all'):
 
-        assert model_type in ['all', 'conv3D_MFCCs', 'conv2D_MF']
+        nets = [
+            MultiStreamDNN(
+                get_visual_model_conv3D(),
+                get_audio_model()
+            ),
+            MultiStreamDNN(
+                get_visual_model_conv2D(),
+                get_audio_model()
+            ),
+            AudioMF()
+        ]
 
-        if model_type == 'all':
-            nets = [
-                MultiStreamDNN(
-                    get_visual_model_conv3D(),
-                    get_audio_model()
-                ),
-                MultiStreamDNN(
-                    get_visual_model_conv2D(),
-                    get_audio_model()
-                )
-            ]
+        if torch.cuda.is_available():
+            for i in range(len(nets)):
+                nets[i] = nets[i].cuda()
 
-            if torch.cuda.is_available():
-                for i in range(len(nets)):
-                    nets[i] = nets[i].cuda()
+        optimizers = [
+            torch.optim.SGD(
+                nets[0].parameters(),
+                lr=constants.LRS[0],
+                momentum=constants.MOMENTUMS[0],
+                weight_decay=constants.WEIGHT_DECAYS[0]
+            ),
+            torch.optim.Adam(
+                nets[1].parameters(),
+                lr=constants.LRS[1],
+                weight_decay=constants.WEIGHT_DECAYS[1]
+            ),
+            torch.optim.Adam(
+                nets[2].parameters(),
+                lr=constants.LRS[2],
+                weight_decay=constants.WEIGHT_DECAYS[2]
+            ),
+        ]
 
-            optimizers = [
-                torch.optim.SGD(
-                    nets[0].parameters(),
-                    lr=constants.SGD_LR,
-                    momentum=constants.SGD_MOMENTUM,
-                    weight_decay=constants.SGD_WEIGHT_DECAY
-                ),
-                torch.optim.Adam(
-                    nets[1].parameters(),
-                    lr=constants.ADAM_LR,
-                    weight_decay=constants.ADAM_WEIGHT_DECAY
-                )
-            ]
-        elif model_type == 'conv3D_MFCCs':
-            nets = [
-                MultiStreamDNN(
-                    get_visual_model_conv3D(),
-                    get_audio_model()
-                )
-            ]
-
-            if torch.cuda.is_available():
-                for i in range(len(nets)):
-                    nets[i] = nets[i].cuda()
-
-            optimizers = [
-                torch.optim.SGD(
-                    nets[0].parameters(),
-                    lr=constants.SGD_LR,
-                    momentum=constants.SGD_MOMENTUM,
-                    weight_decay=constants.SGD_WEIGHT_DECAY
-                )
-            ]
+        if model_type == 'conv3D_MFCCs':
+            nets = [nets[0]]
+            optimizers = [optimizers[0]]
         elif model_type == 'conv2D_MF':
-            nets = [
-                MultiStreamDNN(
-                    get_visual_model_conv2D(),
-                    get_audio_model()
-                )
-            ]
-
-            if torch.cuda.is_available():
-                for i in range(len(nets)):
-                    nets[i] = nets[i].cuda()
-
-            optimizers = [
-                torch.optim.Adam(
-                    nets[0].parameters(), 
-                    lr=constants.ADAM_LR, 
-                    weight_decay=constants.ADAM_WEIGHT_DECAY
-                )
-            ]
+            nets = [nets[1]]
+            optimizers = [optimizers[1]]
+        elif model_type == 'audio_MF':
+            nets = [nets[2]]
+            optimizers = [optimizers[2]]
 
         super(EnsembleModelRunner, self).__init__(
             nets,

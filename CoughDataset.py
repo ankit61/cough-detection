@@ -8,10 +8,10 @@ import json
 import torch
 from VATransforms import VideoTransform, ReduceAudioChannels, NormalizeAudio
 
-class CoughDataset(Dataset):
-    def __init__(self, root_dir = constants.DATA_BASE_DIR, result_mode = False, chunk_size = constants.CHUNK_SIZE, model_type='all'):
 
-        assert model_type in ['all', 'conv3D_MFCCs', 'conv2D_MF']
+class CoughDataset(Dataset):
+    def __init__(self, root_dir=constants.DATA_BASE_DIR, result_mode=False, chunk_size=constants.CHUNK_SIZE, model_type='all'):
+
         assert chunk_size == 1, 'current implementation only supports 1 second chunks'
 
         fs = [f for f in os.listdir(root_dir) if f.endswith(constants.VISUAL_SUFFIX)]
@@ -32,8 +32,13 @@ class CoughDataset(Dataset):
                 NormalizeAudio(),
                 AT.Resample(constants.AUDIO_SAMPLE_RATE, constants.RESAMPLED_AUDIO_SAMPLE_RATE),
                 AT.MelSpectrogram(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE, n_mels=constants.N_MELS)
+            ]),
+            IT.Compose([
+                ReduceAudioChannels(),
+                NormalizeAudio(),
+                AT.Resample(constants.AUDIO_SAMPLE_RATE, constants.RESAMPLED_AUDIO_SAMPLE_RATE),
+                AT.MelSpectrogram(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE, n_mels=constants.N_MELS)
             ])
-
         ]
 
         self.ensemble_video_transforms = [
@@ -48,32 +53,40 @@ class CoughDataset(Dataset):
                 VideoTransform(IT.Resize((constants.INPUT_FRAME_WIDTH, constants.INPUT_FRAME_WIDTH))),
                 VideoTransform(IT.ToTensor()),
                 VideoTransform(IT.Normalize(mean=constants.MEAN, std=constants.STD)),
-            ])
+            ]),
+            lambda v: torch.zeros(1)
         ]
 
         self.ensemble_video_post_transforms = [
-            lambda x : x.permute([1, 0, 2, 3]),
-            lambda x : torch.cat(list(x.permute([1, 0, 2, 3]).unbind(1)), dim=0)
+            lambda x: x.permute([1, 0, 2, 3]),
+            lambda x: torch.cat(list(x.permute([1, 0, 2, 3]).unbind(1)), dim=0), 
+            lambda x: x
         ]
 
         self.ensemble_audio_post_transforms = [
-            lambda x : x,
-            lambda x : x
+            lambda x: x,
+            lambda x: x,
+            lambda x: x
         ]
 
         if model_type == 'conv3D_MFCCs':
-            del self.ensemble_video_transforms[1]
-            del self.ensemble_audio_transforms[1]
-            del self.ensemble_video_post_transforms[1]
-            del self.ensemble_audio_post_transforms[1]
+            self.ensemble_video_transforms = [self.ensemble_video_transforms[0]]
+            self.ensemble_audio_transforms = [self.ensemble_audio_transforms[0]]
+            self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[0]]
+            self.ensemble_audio_post_transforms = [self.ensemble_audio_post_transforms[0]]
         elif model_type == 'conv2D_MF':
-            del self.ensemble_video_transforms[0]
-            del self.ensemble_audio_transforms[0]
-            del self.ensemble_video_post_transforms[0]
-            del self.ensemble_audio_post_transforms[0]
+            self.ensemble_video_transforms = [self.ensemble_video_transforms[1]]
+            self.ensemble_audio_transforms = [self.ensemble_audio_transforms[1]]
+            self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[1]]
+            self.ensemble_audio_post_transforms = [self.ensemble_audio_post_transforms[1]]
+        elif model_type == 'audioMF':
+            self.ensemble_video_transforms = [self.ensemble_video_transforms[2]]
+            self.ensemble_audio_transforms = [self.ensemble_audio_transforms[2]]
+            self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[2]]
+            self.ensemble_audio_post_transforms = [self.ensemble_audio_post_transforms[2]]
 
         for f in fs:
-            #break in 1 sec chunks and add label
+            # break in 1 sec chunks and add label
             audio_file = f[:-len(constants.VISUAL_SUFFIX)] + constants.AUDIO_SUFFIX
             chunks, meta = self.break_in_chunks(os.path.join(root_dir, f), os.path.join(root_dir, audio_file),  [] if result_mode else labels[f], chunk_size)
             self.data += chunks
@@ -109,26 +122,26 @@ class CoughDataset(Dataset):
 
         ans = []
         meta = []
-        #break into chunks
+        # break into chunks
         end_frame = int(v.shape[0] / constants.VIDEO_FPS) * constants.VIDEO_FPS
         vid_range = range(0, end_frame, constants.VIDEO_FPS)
 
         end_audio_frame = int(a.shape[1] / constants.AUDIO_SAMPLE_RATE) * constants.AUDIO_SAMPLE_RATE
         audio_range = range(0, end_audio_frame, constants.AUDIO_SAMPLE_RATE)
 
-        for i, (v_frame, a_frame) in enumerate(zip(vid_range, audio_range)): 
-            #apply transforms
+        for i, (v_frame, a_frame) in enumerate(zip(vid_range, audio_range)):
+            # apply transforms
             v_chunk = v[v_frame:v_frame + constants.VIDEO_FPS]
             a_chunk = a[:, a_frame:a_frame + constants.AUDIO_SAMPLE_RATE]
 
             cur_ans = ()
 
             for j in range(len(self.ensemble_video_transforms)):
-                cur_ans +=  (self.ensemble_video_post_transforms[j](
+                cur_ans += (self.ensemble_video_post_transforms[j](
                                 self.ensemble_video_transforms[j](v_chunk)
                             ),)
 
-                cur_ans +=  (self.ensemble_audio_post_transforms[j](
+                cur_ans += (self.ensemble_audio_post_transforms[j](
                                 self.ensemble_audio_transforms[j](a_chunk)
                             ),)
 
