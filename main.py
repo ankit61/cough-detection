@@ -42,13 +42,14 @@ data_loader = DataLoader(
     shuffle=(args.mode == 'train')
 )
 
-test_loader = DataLoader(
-    test_dataset, 
-    batch_size=constants.BATCH_SIZE,
-    shuffle=False
-)
+
 
 if args.mode == 'train':
+    test_loader = DataLoader(
+        test_dataset, 
+        batch_size=constants.BATCH_SIZE,
+        shuffle=False
+    )
     runner.train(data_loader, constants.EPOCHS, val_loader=test_loader)
 elif args.mode == 'test':
     runner.test(data_loader)
