@@ -36,6 +36,10 @@ AUDIO_SUFFIX                = '_a.mp4'
 
 MIN_LEARNING_RATE           = 0.000001
 
+assert N_MELS == 300, 'MEAN, STD COMPUTED FOR N_MELS=300'
+AUDIO_MEAN                  = [3.24896550178527832031]
+AUDIO_STD                   = [42.03905868530273437500]
+
 TENSORBOARDX_BASE_DIR = os.path.join(
     Path(os.path.dirname(os.path.abspath(__file__))), os.path.join('runs', datetime.now().strftime('%b%d_%H-%M-%S') + '_' + getpass.getuser()))
 MODELS_BASE_DIR = os.path.join(
