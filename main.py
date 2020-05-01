@@ -47,16 +47,26 @@ if args.tune:
 if args.model_type == 'all':
     load_paths = [args.conv3d_load_path, args.conv2d_load_path]
 elif args.model_type == 'conv3D_MFCCs':
+    keys_to_remove = []
+
     for k in tune_config:
         if k.startswith('conv2D_MF'):
-            del tune_config[k]
+            keys_to_remove.append(tune_config[k])
+
+    for k in keys_to_remove:
+        del tune_config[k]
 
     load_paths = [args.conv3d_load_path]
 
 elif args.model_type == 'conv2D_MF':
+    keys_to_remove = []
+
     for k in tune_config:
         if k.startswith('conv3D_MFCCs'):
-            del tune_config[k]
+            keys_to_remove.append(tune_config[k])
+
+    for k in keys_to_remove:
+        del tune_config[k]
 
     load_paths = [args.conv2d_load_path]
 
