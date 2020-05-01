@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import os
 from ray import tune
+import ray
 
 parser = argparse.ArgumentParser('arg parser')
 
@@ -35,6 +36,7 @@ test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'g
 tune_config = {}
 
 if args.tune:
+    ray.init(num_cpus=4, num_gpus=1)
     tune_config = {
         'conv3D_MFCCs_lr': tune.grid_search([0.001, 0.005, 0.01, 0.05]),
         'conv3D_MFCCs_momentum': tune.grid_search([0.5, 0.9]),
