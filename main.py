@@ -45,8 +45,6 @@ data_loader = DataLoader(
     shuffle=(args.mode == 'train')
 )
 
-
-
 if args.mode == 'train':
     test_loader = DataLoader(
         test_dataset,
@@ -70,10 +68,10 @@ else:
                 inp[j] = inp[j].cuda()
         prob = runner.do_forward_pass(inp).sigmoid().item()
         original_file, interval = dataset.get_meta(i)
-        
+
         if original_file in file_output:
             file_output[original_file]['coughing'].append([interval[0], prob])
-            
+
             prob_graph_output[original_file].append([interval[0], prob])
             prob_graph_output[original_file].append([interval[1], prob])
 
@@ -81,19 +79,19 @@ else:
             label_graph_output[original_file].append([interval[1], 1 if prob > 0.5 else 0])
         else:
             file_output[original_file] = {'coughing': [interval[0], prob]}
-            
+
             prob_graph_output[original_file] = [[interval[0], prob], [interval[1], prob]]
-            
+
             label_graph_output[original_file] = [[interval[0], 1 if prob > 0.5 else 0], [interval[1], 1 if prob > 0.5 else 0]]
 
-    matplotlib.use('Agg') # to avoid displaying figure
+    matplotlib.use('Agg')  # to avoid displaying figure
     for f in prob_graph_output:
-        #make json
+        # make json
         out_file = f.split('.')[0] + '.json'
         json.dump(file_output[f], open(out_file, 'w'))
         print('Saving ' + out_file + '...')
 
-        #make probability figure
+        # make probability figure
         fig_file = f.split('.')[0] + '_prob.png'
         graph = np.array(prob_graph_output[f])
         fig = plt.figure()
@@ -105,7 +103,7 @@ else:
         plt.close(fig)
         print('Saving ' + fig_file + '...')
 
-        #make label figure
+        # make label figure
         fig_file = f.split('.')[0] + '_label.png'
         graph = np.array(label_graph_output[f])
         fig = plt.figure()
