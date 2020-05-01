@@ -6,7 +6,7 @@ import constants
 
 
 def get_audio_model():
-    net = resnet18()
+    net = resnet34()
     net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     net.bn1 = nn.BatchNorm2d(64)
     net.fc = nn.Sequential()
