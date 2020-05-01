@@ -14,11 +14,12 @@ import warnings
 LR_DECAY_STEP_SIZE  = 10
 LR_DECAY_FACTOR     = 0.9
 
+
 class BaseRunner(metaclass=ABCMeta):
-    #inspired by https://github.com/pytorch/examples/blob/master/imagenet/main.py
+    # inspired by https://github.com/pytorch/examples/blob/master/imagenet/main.py
 
     def __init__(self, models, loss_fn, optimizers, best_metric_name,
-        should_minimize_best_metric, debug = True, introspect = True, load_paths=None, model_code = ''):
+        should_minimize_best_metric, debug=True, introspect=True, load_paths=None, model_code = ''):
 
         assert type(models) == type([]), 'models must be a list'
         assert type(optimizers) == type([]), 'optimizers must be a list'
@@ -188,6 +189,8 @@ class BaseRunner(metaclass=ABCMeta):
             elif epoch % constants.SAVE_FREQ == 0:
                 self.save_nets(epoch)
 
+        self.post_train_processing()
+
         for i in range(len(self.lr_schedulers)):
             if(min(self.lr_schedulers[i].get_lr()) >=\
                 constants.MIN_LEARNING_RATE):
@@ -262,4 +265,7 @@ class BaseRunner(metaclass=ABCMeta):
 
     @abstractmethod
     def get_batch_size(self, batch):
+        return
+
+    def post_train_processing(self):
         return
