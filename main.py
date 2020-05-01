@@ -51,7 +51,7 @@ elif args.model_type == 'conv3D_MFCCs':
 
     for k in tune_config:
         if k.startswith('conv2D_MF'):
-            keys_to_remove.append(tune_config[k])
+            keys_to_remove.append(k)
 
     for k in keys_to_remove:
         del tune_config[k]
@@ -63,7 +63,7 @@ elif args.model_type == 'conv2D_MF':
 
     for k in tune_config:
         if k.startswith('conv3D_MFCCs'):
-            keys_to_remove.append(tune_config[k])
+            keys_to_remove.append(k)
 
     for k in keys_to_remove:
         del tune_config[k]
