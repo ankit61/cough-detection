@@ -12,7 +12,7 @@ SAVE_FREQ                   = 5
 
 # HYPERPARAMETERS
 BATCH_SIZE                  = 32
-EPOCHS                      = 25
+EPOCHS                      = 300
 DROPOUT_PROB                = 0.5
 FRAME_3D_CONVS              = 10
 HOLISTIC_FEATURES_LEN       = 1024
