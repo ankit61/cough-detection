@@ -109,7 +109,7 @@ if args.mode == 'train':
         runner.train(data_loader, constants.EPOCHS, val_loader=test_loader)
 
     if args.tune:
-        analysis = tune.run(train_tune, config=tune_config)
+        analysis = tune.run(train_tune, config=tune_config, resources_per_trial={'cpu':4, 'gpu':1})
         df = analysis.dataframe()
         print(df)
     else:
