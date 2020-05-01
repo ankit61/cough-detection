@@ -21,7 +21,7 @@ parser.add_argument('--model-type', default='all', choices=['all', 'conv3D_MFCCs
 parser.add_argument('--conv2d-load-path', default='')
 parser.add_argument('--conv3d-load-path', default='')
 parser.add_argument('--data-dir', '-d', default=constants.DATA_BASE_DIR)
-parser.add_argument('--tune', default='True', choices=['True', 'False'])
+parser.add_argument('--tune', default='False', choices=['True', 'False'])
 if os.path.exists(os.path.join(constants.DATA_BASE_DIR, 'test')):
     parser.add_argument('--test-dir', '-t', default=os.path.join(constants.DATA_BASE_DIR, 'test'))
 else:
