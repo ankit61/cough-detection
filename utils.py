@@ -4,9 +4,10 @@ import numpy as np
 from collections import defaultdict
 import constants
 
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
-    #taken from https://github.com/pytorch/examples/blob/master/imagenet/main.py
+    # taken from https://github.com/pytorch/examples/blob/master/imagenet/main.py
     def __init__(self, name, fmt=':6.3f'):
         self.name = name
         self.fmt = fmt
@@ -18,7 +19,7 @@ class AverageMeter(object):
         self.sum = 0
         self.count = 0
 
-    def update(self, val, n=1):
+    def update(self, val, n):
         self.val = val
         self.sum += val * n
         self.count += n
@@ -28,8 +29,9 @@ class AverageMeter(object):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
 
+
 class ProgressMeter(object):
-    #taken from https://github.com/pytorch/examples/blob/master/imagenet/main.py
+    # taken from https://github.com/pytorch/examples/blob/master/imagenet/main.py
     def __init__(self, num_batches, meters, prefix=""):
         self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
         self.meters = meters

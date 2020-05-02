@@ -4,81 +4,78 @@ from BaseRunner import BaseRunner
 import torch
 import constants
 import torch.nn as nn
+from torchvision.models import resnet34
+from ray import tune
+
+
+class AudioMF(nn.Module):
+    def __init__(self):
+        super(AudioMF, self).__init__()
+        self.net = resnet34(num_classes=1)
+        self.net.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.net.bn1 = nn.BatchNorm2d(64)
+
+    def forward(self, v, a):
+        return self.net(a)
 
 
 class EnsembleModelRunner(BaseRunner):
-    def __init__(self, load_paths, model_type='all'):
+    def __init__(self, load_paths, use_tune,
+                 tune_config, model_type='all',):
+        self.use_tune = use_tune
+        self.tune_config = tune_config
 
-        assert model_type in ['all', 'conv3D_MFCCs', 'conv2D_MF']
+        nets = [
+            MultiStreamDNN(
+                get_visual_model_conv3D(),
+                get_audio_model()
+            ),
+            MultiStreamDNN(
+                get_visual_model_conv3D(),
+                get_audio_model()
+            )
+        ]
 
-        if model_type == 'all':
-            nets = [
-                MultiStreamDNN(
-                    get_visual_model_conv3D(),
-                    get_audio_model()
-                ),
-                MultiStreamDNN(
-                    get_visual_model_conv2D(),
-                    get_audio_model()
-                )
-            ]
-
-            if torch.cuda.is_available():
-                for i in range(len(nets)):
-                    nets[i] = nets[i].cuda()
-
+        if torch.cuda.is_available():
+            for i in range(len(nets)):
+                nets[i] = nets[i].cuda()
+        if self.use_tune:
             optimizers = [
                 torch.optim.SGD(
                     nets[0].parameters(),
-                    lr=constants.SGD_LR,
-                    momentum=constants.SGD_MOMENTUM,
-                    weight_decay=constants.SGD_WEIGHT_DECAY
+                    lr=self.tune_config['conv3D_MFCCs_lr'],
+                    momentum=self.tune_config['conv3D_MFCCs_momentum'],
+                    weight_decay=self.tune_config['conv3D_MFCCs_weight_decay']
                 ),
                 torch.optim.Adam(
                     nets[1].parameters(),
-                    lr=constants.ADAM_LR,
-                    weight_decay=constants.ADAM_WEIGHT_DECAY
+                    lr=self.tune_config['conv2D_MF_lr'],
+                    weight_decay=self.tune_config['conv2D_MF_weight_decay']
                 )
             ]
-        elif model_type == 'conv3D_MFCCs':
-            nets = [
-                MultiStreamDNN(
-                    get_visual_model_conv3D(),
-                    get_audio_model()
-                )
-            ]
-
-            if torch.cuda.is_available():
-                for i in range(len(nets)):
-                    nets[i] = nets[i].cuda()
-
+        else:
             optimizers = [
                 torch.optim.SGD(
                     nets[0].parameters(),
-                    lr=constants.SGD_LR,
-                    momentum=constants.SGD_MOMENTUM,
-                    weight_decay=constants.SGD_WEIGHT_DECAY
-                )
-            ]
-        elif model_type == 'conv2D_MF':
-            nets = [
-                MultiStreamDNN(
-                    get_visual_model_conv2D(),
-                    get_audio_model()
-                )
-            ]
-
-            if torch.cuda.is_available():
-                for i in range(len(nets)):
-                    nets[i] = nets[i].cuda()
-
-            optimizers = [
+                    lr=constants.LRS[0],
+                    momentum=constants.MOMENTUMS[0],
+                    weight_decay=constants.WEIGHT_DECAYS[0]
+                ),
                 torch.optim.Adam(
-                    nets[0].parameters(), 
-                    lr=constants.ADAM_LR, 
-                    weight_decay=constants.ADAM_WEIGHT_DECAY
+                    nets[1].parameters(),
+                    lr=constants.LRS[1],
+                    weight_decay=constants.WEIGHT_DECAYS[1]
                 )
             ]
+
+        if model_type == 'conv3D_MFCCs':
+            nets = [nets[0]]
+            optimizers = [optimizers[0]]
+        elif model_type == 'conv2D_MF':
+            nets = [nets[1]]
+            optimizers = [optimizers[1]]
+        elif model_type != 'all':
+            raise Exception('unknown model_type')
 
         super(EnsembleModelRunner, self).__init__(
             nets,
@@ -125,10 +122,17 @@ class EnsembleModelRunner(BaseRunner):
 
         return pred
 
+    def get_batch_size(self, batch):
+        return batch[-1].shape[0]
+
     def test_batch_and_get_metrics(self, batch):
         pred = self.do_forward_pass(batch)
 
         return self.get_metrics(pred, batch[-1])
+
+    def post_train_processing(self):
+        if self.use_tune:
+            tune.track(best_acc=self.best_metric_val)
 
     def get_metrics(self, pred, gt, get_original_loss=False):
         loss            = self.loss_fn(pred, gt.float())
