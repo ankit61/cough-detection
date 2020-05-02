@@ -74,7 +74,7 @@ class EnsembleModelRunner(BaseRunner):
         elif model_type == 'conv2D_MF':
             nets = [nets[1]]
             optimizers = [optimizers[1]]
-        else:
+        elif model_type != 'all':
             raise Exception('unknown model_type')
 
         super(EnsembleModelRunner, self).__init__(
