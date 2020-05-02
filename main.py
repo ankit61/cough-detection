@@ -127,7 +127,7 @@ else:
     label_graph_output = {}
 
     for i in range(len(dataset)):
-        inp = [dataset[i][0].unsqueeze(dim=0), dataset[i][1].unsqueeze(dim=0), dataset[i][2].unsqueeze(dim=0), dataset[i][3].unsqueeze(dim=0)]
+        inp = [dataset[i][j].unsqueeze(dim=0) for j in range(len(dataset[i]) - 1)]
         if torch.cuda.is_available():
             for j in range(len(inp)):
                 inp[j] = inp[j].cuda()
