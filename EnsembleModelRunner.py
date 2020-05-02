@@ -31,7 +31,7 @@ class EnsembleModelRunner(BaseRunner):
                 get_audio_model()
             ),
             MultiStreamDNN(
-                get_visual_model_conv2D(),
+                get_visual_model_conv3D(),
                 get_audio_model()
             )
         ]

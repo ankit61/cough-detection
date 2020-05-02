@@ -31,14 +31,7 @@ class CoughDataset(Dataset):
                 ReduceAudioChannels(),
                 NormalizeAudio(),
                 AT.Resample(constants.AUDIO_SAMPLE_RATE, constants.RESAMPLED_AUDIO_SAMPLE_RATE),
-                AT.MelSpectrogram(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE, n_mels=constants.N_MELS)
-            ]),
-            IT.Compose([
-                ReduceAudioChannels(),
-                NormalizeAudio(),
-                AT.Resample(constants.AUDIO_SAMPLE_RATE, constants.RESAMPLED_AUDIO_SAMPLE_RATE),
-                AT.MelSpectrogram(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE, n_mels=constants.N_MELS),
-                IT.Normalize(mean=constants.AUDIO_MEAN, std=constants.AUDIO_STD)
+                AT.MFCC(sample_rate=constants.RESAMPLED_AUDIO_SAMPLE_RATE, n_mfcc=constants.N_MFCCS)
             ])
         ]
 
@@ -54,18 +47,15 @@ class CoughDataset(Dataset):
                 VideoTransform(IT.Resize((constants.INPUT_FRAME_WIDTH, constants.INPUT_FRAME_WIDTH))),
                 VideoTransform(IT.ToTensor()),
                 VideoTransform(IT.Normalize(mean=constants.MEAN, std=constants.STD)),
-            ]),
-            lambda v: torch.zeros(1)
+            ])
         ]
 
         self.ensemble_video_post_transforms = [
             lambda x: x.permute([1, 0, 2, 3]),
-            lambda x: torch.cat(list(x.permute([1, 0, 2, 3]).unbind(1)), dim=0), 
-            lambda x: x
+            lambda x: x.permute([1, 0, 2, 3])
         ]
 
         self.ensemble_audio_post_transforms = [
-            lambda x: x,
             lambda x: x,
             lambda x: x
         ]
@@ -75,16 +65,6 @@ class CoughDataset(Dataset):
             self.ensemble_audio_transforms = [self.ensemble_audio_transforms[0]]
             self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[0]]
             self.ensemble_audio_post_transforms = [self.ensemble_audio_post_transforms[0]]
-        elif model_type == 'conv2D_MF':
-            self.ensemble_video_transforms = [self.ensemble_video_transforms[1]]
-            self.ensemble_audio_transforms = [self.ensemble_audio_transforms[1]]
-            self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[1]]
-            self.ensemble_audio_post_transforms = [self.ensemble_audio_post_transforms[1]]
-        elif model_type == 'audio_MF':
-            self.ensemble_video_transforms = [self.ensemble_video_transforms[2]]
-            self.ensemble_audio_transforms = [self.ensemble_audio_transforms[2]]
-            self.ensemble_video_post_transforms = [self.ensemble_video_post_transforms[2]]
-            self.ensemble_audio_post_transforms = [self.ensemble_audio_post_transforms[2]]
 
         for f in fs:
             # break in 1 sec chunks and add label

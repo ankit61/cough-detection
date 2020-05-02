@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser('arg parser')
 parser.add_argument('--mode', '-m', default='train', choices=['train', 'test', 'gen_result'])
 parser.add_argument('--model-type', default='all', choices=['all', 'conv3D_MFCCs', 'conv2D_MF'])
 parser.add_argument('--conv2d-load-path', default='')
-parser.add_argument('--conv3d-load-path', default='')
+parser.add_argument('--conv3d-load-path', default='', action='append')
 parser.add_argument('--data-dir', '-d', default=constants.DATA_BASE_DIR)
 parser.add_argument('--tune', default='False', choices=['True', 'False'])
 if os.path.exists(os.path.join(constants.DATA_BASE_DIR, 'test')):
@@ -31,7 +31,6 @@ args = parser.parse_args()
 args.tune = True if args.tune == 'True' else False
 
 dataset = CoughDataset(root_dir=args.data_dir, result_mode=(args.mode == 'gen_result'), model_type=args.model_type)
-test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'gen_result'), model_type=args.model_type)
 
 tune_config = {}
 
@@ -84,6 +83,7 @@ data_loader = DataLoader(
             )
 
 if args.mode == 'train':
+    test_dataset = CoughDataset(root_dir=args.test_dir, result_mode=(args.mode == 'gen_result'), model_type=args.model_type)
 
     def train_tune(tune_config):
         runner = EnsembleModelRunner(
@@ -116,7 +116,6 @@ if args.mode == 'train':
         print(df)
     else:
         train_tune({})
-
 
 elif args.mode == 'test':
     runner.test(data_loader)
