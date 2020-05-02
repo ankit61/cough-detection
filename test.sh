@@ -1,20 +1,19 @@
 #!/bin/bash
 
-#Replace the variables with your github repo url, repo name, test
-video name, json named by your UIN
+#Replace the variables with your github repo url, repo name, test video name, json named by your UIN
 GIT_REPO_URL="https://github.com/ankit61/cough-detection"
 REPO="cough-detection"
 
-OPENPOSE_VIDEO="YOUR_VIDEO_NAME_v.mp4" # name must end with "_v.mp4" (refer GitHub README
-AUDIO_STREAM_VIDEO="YOUR_VIDEO_NAME_a.mp4" # name must end with "_a.mp4" (refer GitHub README)
+BASE_VIDEO_NAME="1082C4FE-F10F-4621-B50E-21C38C4D" # make sure this is in the current working directory
+
+OPENPOSE_VIDEO="${BASE_VIDEO_NAME}_v.mp4" # refer GitHub README
+AUDIO_STREAM_VIDEO="${BASE_VIDEO_NAME}_a.mp4" # name must end with "_a.mp4" (refer GitHub README)
 
 TEMP_DIR="temp_825006585/"
 
-OUT_JSON=echo "${OPENPOSE_VIDEO##*/}" | cut -d. -f1
-OUT_JSON="${OUT_JSON}.json"
+OUT_JSON="${BASE_VIDEO_NAME}_v.json"
 
-OUT_PNG=echo "${OPENPOSE_VIDEO##*/}" | cut -d. -f1
-OUT_PNG="${OUT_JSON}.png"
+OUT_PNG="${BASE_VIDEO_NAME}_v_label.png"
 
 UIN_JSON="825006585.json"
 UIN_PNG="825006585.png"
@@ -37,13 +36,13 @@ sudo add-apt-repository --remove -y ppa:savoury1/multimedia
 
 mkdir $TEMP_DIR # make temp directory to store data
 cp $OPENPOSE_VIDEO $TEMP_DIR
-cp $OPENPOSE_VIDEO $TEMP_DIR
+cp $AUDIO_STREAM_VIDEO $TEMP_DIR
 
-echo $OPENPOSE_VIDEO
+echo $BASE_VIDEO_NAME
 
-python3 main.py --data-dir $TEMP_DIR --mode gen_result --model_type conv3D_MFCCs --conv3d-load-path models/MultiStreamDNN00_checkpoint_20_9030.pth
+python3 main.py --data-dir $TEMP_DIR --mode gen_result --model-type conv3D_MFCCs --conv3d-load-path /content/MultiStreamDNN00_checkpoint_20_9030.pth
 
 rm -r $TEMP_DIR
 
-cp OUT_JSON $UIN_JSON
-cp OUT_PNG $UIN_PNG
+cp $OUT_JSON $UIN_JSON
+cp $OUT_PNG $UIN_PNG
