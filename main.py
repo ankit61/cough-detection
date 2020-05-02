@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser('arg parser')
 parser.add_argument('--mode', '-m', default='train', choices=['train', 'test', 'gen_result'])
 parser.add_argument('--model-type', default='all', choices=['all', 'conv3D_MFCCs', 'conv2D_MF'])
 parser.add_argument('--conv2d-load-path', default='')
-parser.add_argument('--conv3d-load-path', default='', action='append')
+parser.add_argument('--conv3d-load-path', default=[], action='append')
 parser.add_argument('--data-dir', '-d', default=constants.DATA_BASE_DIR)
 parser.add_argument('--tune', default='False', choices=['True', 'False'])
 if os.path.exists(os.path.join(constants.DATA_BASE_DIR, 'test')):
@@ -46,7 +46,7 @@ if args.tune:
     }
 
 if args.model_type == 'all':
-    load_paths = [args.conv3d_load_path, args.conv2d_load_path]
+    load_paths = args.conv3d_load_path
 elif args.model_type == 'conv3D_MFCCs':
     keys_to_remove = []
 
@@ -57,7 +57,7 @@ elif args.model_type == 'conv3D_MFCCs':
     for k in keys_to_remove:
         del tune_config[k]
 
-    load_paths = [args.conv3d_load_path]
+    load_paths = args.conv3d_load_path
 
 elif args.model_type == 'conv2D_MF':
     keys_to_remove = []
