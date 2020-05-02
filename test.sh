@@ -41,7 +41,7 @@ cp $OPENPOSE_VIDEO $TEMP_DIR
 
 echo $OPENPOSE_VIDEO
 
-python3 main.py --data-dir $TEMP_DIR --mode gen_result --conv2d-load-path models/MultiStreamDNN00_checkpoint_1_8570.pth --conv3d-load-path models/MultiStreamDNN00_checkpoint_20_9030.pth
+python3 main.py --data-dir $TEMP_DIR --mode gen_result --model_type conv3D_MFCCs --conv3d-load-path models/MultiStreamDNN00_checkpoint_20_9030.pth
 
 rm -r $TEMP_DIR
 
