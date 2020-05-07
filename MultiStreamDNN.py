@@ -15,7 +15,7 @@ def get_audio_model():
 
 
 def get_visual_model_conv3D():
-    net = resnet103D(
+    net = resnet183D(
             num_classes=constants.NUM_CLASSES,
             sample_duration=constants.VIDEO_FPS,
             sample_size=constants.INPUT_FRAME_WIDTH
