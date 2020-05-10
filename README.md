@@ -71,18 +71,3 @@ Sample videos playlist:
 
 Video explaining how to run: https://youtu.be/Ov9urimfum8
 
-## Training Images
-
-Training Accuracy over time
-![Training Accuracy](images/train_acc.png)
-
-Training Loss over time 
-![Training Loss](images/train_loss.png)
-
-Testing Accuracy over time
-![Testing Accuracy](images/test_acc.png)
-
-Some Weight Norms (helpful to see regularization effect)
-![Weight Norms](images/weight_norms.png)
-
-Note that these images correspond to the training of the 3D convolution network (the first model in the ensemble).
